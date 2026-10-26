@@ -140,7 +140,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Reservas
+# Dominio principal, SEO y Reservas
+BRUMA_SITE_DOMAIN = os.getenv('BRUMA_SITE_DOMAIN', 'brumarestaurant.es')
+BRUMA_SITE_URL = os.getenv('BRUMA_SITE_URL', f'https://{BRUMA_SITE_DOMAIN}')
+BRUMA_ACCEPTS_RESERVATIONS = os.getenv('BRUMA_ACCEPTS_RESERVATIONS', 'True').lower() in ('true', '1', 'yes')
+
 # Número máximo de días de antelación con los que se puede reservar.
 BRUMA_RESERVATION_MAX_DAYS_AHEAD = int(os.getenv('BRUMA_RESERVATION_MAX_DAYS_AHEAD', '90'))
 

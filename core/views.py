@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.http import HttpResponse
 from django.utils import timezone
 from django.views.generic import TemplateView
 
@@ -24,3 +25,33 @@ class HomeView(TemplateView):
             reservation_max_days=settings.BRUMA_RESERVATION_MAX_DAYS_AHEAD,
         )
         return context
+
+
+def robots_txt(request):
+    """Archivo robots.txt para indexación profesional por buscadores."""
+    site_url = getattr(settings, 'BRUMA_SITE_URL', 'https://brumarestaurant.es')
+    lines = [
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /admin/',
+        f'Sitemap: {site_url}/sitemap.xml',
+    ]
+    return HttpResponse('\n'.join(lines) + '\n', content_type='text/plain; charset=utf-8')
+
+
+def sitemap_xml(request):
+    """Sitemap XML principal con el dominio canónico brumarestaurant.es."""
+    site_url = getattr(settings, 'BRUMA_SITE_URL', 'https://brumarestaurant.es')
+    today = timezone.localdate().isoformat()
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        '  <url>\n'
+        f'    <loc>{site_url}/</loc>\n'
+        f'    <lastmod>{today}</lastmod>\n'
+        '    <changefreq>weekly</changefreq>\n'
+        '    <priority>1.0</priority>\n'
+        '  </url>\n'
+        '</urlset>\n'
+    )
+    return HttpResponse(xml, content_type='application/xml; charset=utf-8')

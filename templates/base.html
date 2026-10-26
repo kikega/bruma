@@ -3,13 +3,206 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{% block title %}{{ restaurant.name }} · {{ restaurant.tagline }}{% endblock %}</title>
-  <meta name="description" content="{% block description %}Bruma, restaurante de alta cocina mediterránea frente al mar. Producto de lonja, arroces, pescados de costera y bodega de blancos salinos. Reserva tu mesa.{% endblock %}">
+
+  {# ── SEO Principal ────────────────────────────────────────────────────── #}
+  <title>{% block title %}{{ seo.title }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ seo.description }}{% endblock %}">
+  <meta name="keywords" content="{% block keywords %}{{ seo.keywords }}{% endblock %}">
+  <meta name="author" content="{{ restaurant.name }} · Chef {{ restaurant.chef }}">
+  <meta name="robots" content="{% block robots %}index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1{% endblock %}">
+  <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+  {# ── URL Canónica e Internacionalización ──────────────────────────────── #}
+  <link rel="canonical" href="{% block canonical %}{{ seo.canonical_url }}{% endblock %}">
+  <link rel="alternate" hreflang="es-ES" href="{{ seo.canonical_url }}">
+  <link rel="alternate" hreflang="es" href="{{ seo.canonical_url }}">
+  <link rel="alternate" hreflang="x-default" href="{{ seo.canonical_url }}">
+
+  {# ── SEO Local y Geolocalización (Alicante · Mediterráneo) ────────────── #}
+  <meta name="geo.region" content="ES-A">
+  <meta name="geo.placename" content="{{ restaurant.locality }}">
+  <meta name="geo.position" content="{{ restaurant.geo.latitude }};{{ restaurant.geo.longitude }}">
+  <meta name="ICBM" content="{{ restaurant.geo.latitude }}, {{ restaurant.geo.longitude }}">
+
+  {# ── Identidad de Aplicación e Iconos ─────────────────────────────────── #}
   <meta name="theme-color" content="#F8F9FA">
+  <meta name="application-name" content="{{ restaurant.legal_name }}">
+  <meta name="apple-mobile-web-app-title" content="{{ restaurant.name }}">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="icon" type="image/webp" href="{% static 'img/brumalogo.webp' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/brumalogo.webp' %}">
+
+  {# ── Open Graph (Facebook, WhatsApp, LinkedIn, iMessage) ──────────────── #}
+  <meta property="og:locale" content="{{ seo.locale }}">
+  <meta property="og:site_name" content="{{ restaurant.legal_name }}">
   <meta property="og:type" content="restaurant">
-  <meta property="og:title" content="{{ restaurant.name }} · {{ restaurant.tagline }}">
-  <meta property="og:description" content="Cocina de lonja, sal y calma frente al Mediterráneo.">
-  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/hero-mar.webp' %}">
+  <meta property="og:url" content="{{ seo.canonical_url }}">
+  <meta property="og:title" content="{% block og_title %}{{ seo.og_title }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{{ seo.og_description }}{% endblock %}">
+  <meta property="og:image" content="{{ restaurant.site_url }}{% static 'img/hero-mar.webp' %}">
+  <meta property="og:image:secure_url" content="{{ restaurant.site_url }}{% static 'img/hero-mar.webp' %}">
+  <meta property="og:image:type" content="image/webp">
+  <meta property="og:image:width" content="1376">
+  <meta property="og:image:height" content="768">
+  <meta property="og:image:alt" content="{{ restaurant.name }} · {{ restaurant.tagline }} frente al mar en {{ restaurant.locality }}">
+  <meta property="restaurant:contact_info:street_address" content="{{ restaurant.address_line }}">
+  <meta property="restaurant:contact_info:locality" content="{{ restaurant.locality }}">
+  <meta property="restaurant:contact_info:postal_code" content="{{ restaurant.postal_code }}">
+  <meta property="restaurant:contact_info:country_name" content="{{ restaurant.country }}">
+  <meta property="restaurant:contact_info:email" content="{{ restaurant.email }}">
+  <meta property="restaurant:contact_info:phone_number" content="{{ restaurant.phone }}">
+  <meta property="restaurant:contact_info:website" content="{{ restaurant.site_url }}/">
+  <meta property="place:location:latitude" content="{{ restaurant.geo.latitude }}">
+  <meta property="place:location:longitude" content="{{ restaurant.geo.longitude }}">
+
+  {# ── Twitter / X Cards ────────────────────────────────────────────────── #}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="{{ seo.canonical_url }}">
+  <meta name="twitter:title" content="{{ seo.og_title }}">
+  <meta name="twitter:description" content="{{ seo.og_description }}">
+  <meta name="twitter:image" content="{{ restaurant.site_url }}{% static 'img/hero-mar.webp' %}">
+  <meta name="twitter:image:alt" content="{{ restaurant.name }} · {{ restaurant.tagline }} frente al mar en {{ restaurant.locality }}">
+
+  {# ── Datos Estructurados Schema.org (JSON-LD) ─────────────────────────── #}
+  {% block json_ld %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    "@id": "{{ restaurant.site_url }}/#restaurant",
+    "name": "{{ restaurant.name }}",
+    "alternateName": "{{ restaurant.legal_name }} · {{ restaurant.tagline }}",
+    "description": "{{ seo.description }}",
+    "url": "{{ restaurant.site_url }}/",
+    "mainEntityOfPage": "{{ seo.canonical_url }}",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ restaurant.site_url }}{% static 'img/brumalogo.webp' %}"
+    },
+    "image": [
+      "{{ restaurant.site_url }}{% static 'img/hero-mar.webp' %}",
+      "{{ restaurant.site_url }}{% static 'img/identidad-lonja.webp' %}",
+      "{{ restaurant.site_url }}{% static 'img/identidad-plato.webp' %}",
+      "{{ restaurant.site_url }}{% static 'img/chef-sergio.webp' %}"
+    ],
+    "telephone": "{{ restaurant.phone }}",
+    "email": "{{ restaurant.email }}",
+    "priceRange": "{{ restaurant.price_range }}",
+    "currenciesAccepted": "{{ restaurant.currencies_accepted }}",
+    "paymentAccepted": "{{ restaurant.payment_accepted }}",
+    "servesCuisine": [
+      "Cocina mediterránea",
+      "Alta cocina",
+      "Cocina de autor",
+      "Pescados y mariscos de lonja"
+    ],
+    "acceptsReservations": {{ accepts_reservations|yesno:"true,false" }},
+    "hasMenu": {
+      "@type": "Menu",
+      "@id": "{{ restaurant.site_url }}/#carta",
+      "name": "Carta de Temporada · {{ restaurant.name }}",
+      "description": "Propuesta de alta cocina mediterránea con producto diario de lonja, arroces, pescados salvajes y bodega mediterránea.",
+      "url": "{{ restaurant.site_url }}/#carta"
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "{{ restaurant.address_line }}",
+      "addressLocality": "{{ restaurant.locality }}",
+      "addressRegion": "{{ restaurant.region }}",
+      "postalCode": "{{ restaurant.postal_code }}",
+      "addressCountry": "{{ restaurant.country_code }}"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": {{ restaurant.geo.latitude }},
+      "longitude": {{ restaurant.geo.longitude }}
+    },
+    "hasMap": "{{ restaurant.maps_url }}",
+    "openingHours": [
+      "Tu-Sa 13:30-16:00",
+      "Tu-Sa 20:30-23:30",
+      "Su 13:30-16:00"
+    ],
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "https://schema.org/Tuesday",
+          "https://schema.org/Wednesday",
+          "https://schema.org/Thursday",
+          "https://schema.org/Friday",
+          "https://schema.org/Saturday"
+        ],
+        "opens": "13:30",
+        "closes": "16:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "https://schema.org/Tuesday",
+          "https://schema.org/Wednesday",
+          "https://schema.org/Thursday",
+          "https://schema.org/Friday",
+          "https://schema.org/Saturday"
+        ],
+        "opens": "20:30",
+        "closes": "23:30"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "https://schema.org/Sunday"
+        ],
+        "opens": "13:30",
+        "closes": "16:00"
+      }
+    ],
+    "founder": {
+      "@type": "Person",
+      "name": "{{ restaurant.chef }}",
+      "jobTitle": "Chef Ejecutivo y Fundador",
+      "image": "{{ restaurant.site_url }}{% static 'img/chef-sergio.webp' %}"
+    },
+    "amenityFeature": [
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Terraza frente al mar",
+        "value": true
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Bodega mediterránea climatizada",
+        "value": true
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Información de alérgenos detallada",
+        "value": true
+      }
+    ],
+    "potentialAction": {
+      "@type": "ReserveAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "{{ restaurant.site_url }}/#reservas",
+        "inLanguage": "es-ES",
+        "actionPlatform": [
+          "https://schema.org/DesktopWebPlatform",
+          "https://schema.org/MobileWebPlatform"
+        ]
+      },
+      "result": {
+        "@type": "FoodEstablishmentReservation",
+        "name": "Reserva de mesa en {{ restaurant.name }}"
+      }
+    },
+    "sameAs": [
+      {% for net in restaurant.social %}"{{ net.url }}"{% if not forloop.last %},
+      {% endif %}{% endfor %}
+    ]
+  }
+  </script>
+  {% endblock %}
 
   {# Marca que hay JS antes de pintar: evita destellos en las animaciones de aparición #}
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
