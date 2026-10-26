@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head_extra %}
+  <link rel="preload" as="image" href="{% static 'img/hero-mar.webp' %}"
+        imagesrcset="{% static 'img/hero-mar-sm.webp' %} 960w, {% static 'img/hero-mar.webp' %} 1376w" imagesizes="100vw" fetchpriority="high">
+{% endblock %}
+
+{% block content %}
+  {% include "sections/hero.html" %}
+  {% include "sections/identity.html" %}
+  {% include "sections/chef.html" %}
+  {% include "sections/menu.html" %}
+  {% include "sections/gallery.html" %}
+  {% include "sections/reservations.html" %}
+{% endblock %}

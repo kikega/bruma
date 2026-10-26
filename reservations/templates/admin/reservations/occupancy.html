@@ -1,0 +1,76 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .occ-table { width: 100%; border-collapse: collapse; }
+    .occ-table th, .occ-table td { padding: 8px 10px; vertical-align: top; border-bottom: 1px solid var(--hairline-color); }
+    .occ-day { white-space: nowrap; font-weight: 600; }
+    .occ-day small { display: block; font-weight: 400; color: var(--body-quiet-color); text-transform: capitalize; }
+    .occ-shift { min-width: 260px; }
+    .occ-total { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 4px; }
+    .occ-bar { height: 8px; background: var(--darkened-bg); border-radius: 999px; overflow: hidden; }
+    .occ-bar > span { display: block; height: 100%; background: #8A9A86; }
+    .occ-bar.is-high > span { background: #C2B280; }
+    .occ-bar.is-full > span { background: #B45309; }
+    .occ-areas { list-style: none; margin: 6px 0 0; padding: 0; font-size: 12px; color: var(--body-quiet-color); }
+    .occ-areas li { display: flex; justify-content: space-between; gap: 12px; padding: 1px 0; list-style: none; }
+    .occ-full { color: #B45309; font-weight: 700; }
+  </style>
+{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Inicio</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:reservations_reservation_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; Ocupación
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div id="content-main">
+    <p>
+      Comensales reservados (pendientes + confirmadas) frente a la capacidad por turno de cada zona activa.
+      Mostrando los próximos {{ days }} días ·
+      <a href="?dias=7">7</a> · <a href="?dias=14">14</a> · <a href="?dias=30">30</a>
+    </p>
+    {% if not areas %}
+      <p class="errornote">No hay zonas activas. <a href="{% url 'admin:reservations_seatingarea_add' %}">Crea una zona</a> para empezar a aceptar reservas.</p>
+    {% else %}
+      <table class="occ-table">
+        <thead>
+          <tr><th scope="col">Día</th><th scope="col">Mediodía</th><th scope="col">Noche</th></tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>
+              <th scope="row" class="occ-day">
+                {{ row.date|date:"d/m/Y" }}<small>{{ row.date|date:"l" }}</small>
+              </th>
+              {% for s in row.shifts %}
+                <td class="occ-shift">
+                  <div class="occ-total">
+                    <a href="{% url 'admin:reservations_reservation_changelist' %}?date={{ row.date|date:'Y-m-d' }}&shift__exact={{ s.shift.value }}">
+                      {{ s.booked }} / {{ s.capacity }} comensales
+                    </a>
+                    {% if s.full %}<span class="occ-full">COMPLETO</span>{% else %}<span>{{ s.percent }}%</span>{% endif %}
+                  </div>
+                  <div class="occ-bar {% if s.full %}is-full{% elif s.percent >= 75 %}is-high{% endif %}" role="img" aria-label="{{ s.percent }}% ocupado">
+                    <span style="width: {{ s.percent }}%"></span>
+                  </div>
+                  <ul class="occ-areas">
+                    {% for o in s.areas %}
+                      <li><span>{{ o.area.name }}</span><span>{{ o.booked }}/{{ o.capacity }}{% if o.remaining == 0 %} · <strong class="occ-full">lleno</strong>{% endif %}</span></li>
+                    {% endfor %}
+                  </ul>
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+{% endblock %}

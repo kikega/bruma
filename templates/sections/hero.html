@@ -1,0 +1,43 @@
+{% load static %}
+{# Hero · 3 capas de parallax: mar (fondo) → bruma (intermedia) → texto (primer plano) #}
+<section id="inicio" class="relative isolate h-svh min-h-[36rem] overflow-clip bg-bruma" data-parallax-scope aria-labelledby="hero-title">
+  {# Capa 1 · Mar al amanecer (la más lenta) #}
+  <div class="absolute inset-0 -bottom-[30%]" data-parallax data-parallax-range="exit" style="--parallax-to: 30%">
+    <img src="{% static 'img/hero-mar.webp' %}"
+         srcset="{% static 'img/hero-mar-sm.webp' %} 960w, {% static 'img/hero-mar.webp' %} 1376w" sizes="100vw"
+         alt="" width="1376" height="768" fetchpriority="high" decoding="async"
+         class="h-full w-full object-cover object-[60%_center]">
+  </div>
+
+  {# Capa 2 · Bruma animada (velocidad intermedia) #}
+  <div class="pointer-events-none absolute inset-0" data-parallax data-parallax-range="exit" style="--parallax-to: 12%" aria-hidden="true">
+    <div class="mist-layer mist-layer--far animate-bruma-fast"></div>
+    <div class="mist-layer animate-bruma-slow"></div>
+  </div>
+
+  {# Velo para garantizar contraste del texto #}
+  <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-espuma/70 via-espuma/20 to-abisal/50" aria-hidden="true"></div>
+
+  {# Capa 3 · Texto (la más rápida, se desvanece) #}
+  <div class="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-6 pb-16 text-center"
+       data-parallax data-parallax-range="exit" style="--parallax-to: -35%; --parallax-fade-to: 0">
+    <p class="eyebrow animate-fade-in-up text-mediterraneo">Alta cocina mediterránea</p>
+    <h1 id="hero-title" class="mt-6 max-w-4xl animate-fade-in-up font-serif text-5xl leading-[0.95] font-medium text-abisal [animation-delay:120ms] sm:text-7xl lg:text-8xl">
+      Donde el mar <em class="font-normal text-mediterraneo">se vuelve</em> bruma
+    </h1>
+    <p class="mt-6 max-w-xl animate-fade-in-up text-base leading-relaxed text-abisal/75 [animation-delay:240ms] sm:text-lg">
+      Producto de lonja, sal y luz difusa de la costa. Una travesía sensorial por el Mediterráneo al amanecer.
+    </p>
+    <div class="mt-10 flex animate-fade-in-up flex-col gap-3 [animation-delay:360ms] sm:flex-row">
+      <a href="#reservas" class="btn btn-arena px-8">Reservar mesa</a>
+      <a href="#carta" class="btn btn-ghost glass px-8">Explorar la carta</a>
+    </div>
+  </div>
+
+  <a href="#identidad" class="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-espuma/90" aria-label="Descubrir Bruma">
+    <span class="flex flex-col items-center gap-2 text-[0.65rem] font-semibold tracking-editorial uppercase">
+      Descubrir
+      <svg class="size-5 animate-scroll-cue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
+    </span>
+  </a>
+</section>

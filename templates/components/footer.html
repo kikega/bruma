@@ -1,0 +1,77 @@
+{% load static %}
+<footer class="relative overflow-clip bg-abisal-900 text-espuma/80" aria-labelledby="footer-title">
+  <h2 id="footer-title" class="sr-only">Información de contacto</h2>
+  <div class="mx-auto grid max-w-6xl gap-12 px-6 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:py-20">
+    <div class="sm:col-span-2 lg:col-span-1">
+      <p class="font-serif text-4xl font-medium tracking-[0.18em] text-espuma uppercase">{{ restaurant.name }}</p>
+      <p class="mt-3 max-w-xs text-sm leading-relaxed text-espuma/60">{{ restaurant.tagline }}. Cocina de lonja, sal y calma frente al Mediterráneo.</p>
+      <ul class="mt-6 flex gap-3" role="list">
+        {% for net in restaurant.social %}
+          <li>
+            <a href="{{ net.url }}" target="_blank" rel="noopener noreferrer"
+               class="inline-flex size-11 items-center justify-center rounded-full border border-white/15 text-espuma/80 transition-colors hover:border-arena hover:text-arena"
+               aria-label="{{ net.name }} (se abre en una pestaña nueva)">
+              {% include "components/social_icon.html" with icon=net.icon %}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <address class="not-italic">
+      <h3 class="eyebrow !text-arena">Dónde estamos</h3>
+      <p class="mt-4 leading-relaxed">{{ restaurant.address_line }}<br>{{ restaurant.city }}<br>{{ restaurant.country }}</p>
+      <p class="mt-4 space-y-1 text-sm">
+        <a class="block transition-colors hover:text-arena" href="tel:{{ restaurant.phone_href }}">{{ restaurant.phone }}</a>
+        <a class="block transition-colors hover:text-arena" href="mailto:{{ restaurant.email }}">{{ restaurant.email }}</a>
+      </p>
+    </address>
+
+    <div>
+      <h3 class="eyebrow !text-arena">Horario</h3>
+      <dl class="mt-4 space-y-3 text-sm">
+        {% for h in restaurant.hours %}
+          <div>
+            <dt class="font-semibold text-espuma">{{ h.days }}</dt>
+            <dd class="text-espuma/60">{{ h.time }}</dd>
+          </div>
+        {% endfor %}
+      </dl>
+    </div>
+
+    <div>
+      <h3 class="eyebrow !text-arena">Cómo llegar</h3>
+      {# Mapa estilizado: ilustración SVG ligera que enlaza a Google Maps (sin iframes de terceros) #}
+      <a href="{{ restaurant.maps_url }}" target="_blank" rel="noopener noreferrer"
+         class="group mt-4 block overflow-hidden rounded-bruma border border-white/10 transition-colors hover:border-arena/60"
+         aria-label="Abrir la ubicación de {{ restaurant.name }} en Google Maps (se abre en una pestaña nueva)">
+        <svg viewBox="0 0 240 150" class="h-auto w-full" aria-hidden="true">
+          <rect width="240" height="150" fill="#122233" />
+          <path d="M0 98 C40 90 70 104 110 96 S180 84 240 92 V150 H0Z" fill="#1D4E89" opacity=".55" />
+          <path d="M0 108 C50 100 80 114 120 106 S190 96 240 102" stroke="#8A9A86" stroke-opacity=".5" fill="none" />
+          <g stroke="#E2E8F0" stroke-opacity=".18" stroke-width="1.2" fill="none">
+            <path d="M0 40 H240 M0 70 H240 M60 0 V96 M130 0 V92 M190 0 V90" />
+            <path d="M20 0 L95 90 M160 0 L210 88" />
+          </g>
+          <path d="M0 86 C60 80 120 88 240 80" stroke="#C2B280" stroke-width="2.5" fill="none" />
+          <g class="origin-[120px_70px] transition-transform duration-500 group-hover:-translate-y-1">
+            <circle cx="120" cy="80" r="14" fill="#C2B280" opacity=".18" />
+            <path d="M120 54c-8 0-14 6-14 13.5C106 78 120 90 120 90s14-12 14-22.5C134 60 128 54 120 54z" fill="#C2B280" />
+            <circle cx="120" cy="67" r="4.5" fill="#0F1E2E" />
+          </g>
+        </svg>
+        <span class="flex items-center justify-between px-4 py-3 text-sm text-espuma/80 group-hover:text-arena">
+          Abrir en Google Maps
+          <svg class="size-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.64l-3.22-3.22a.75.75 0 1 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 1 1-1.06-1.06l3.22-3.22H3.75A.75.75 0 0 1 3 10z" clip-rule="evenodd"/></svg>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <div class="border-t border-white/10">
+    <div class="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-6 text-xs text-espuma/45 sm:flex-row sm:items-center sm:justify-between">
+      <p>&copy; {% now "Y" %} {{ restaurant.name }} · {{ restaurant.tagline }}</p>
+      <p>Información sobre alérgenos disponible para todos nuestros platos. Consulte a nuestro equipo.</p>
+    </div>
+  </div>
+</footer>

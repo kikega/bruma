@@ -1,0 +1,37 @@
+{% load static %}<!doctype html>
+<html lang="es" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}{{ restaurant.name }} · {{ restaurant.tagline }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}Bruma, restaurante de alta cocina mediterránea frente al mar. Producto de lonja, arroces, pescados de costera y bodega de blancos salinos. Reserva tu mesa.{% endblock %}">
+  <meta name="theme-color" content="#F8F9FA">
+  <meta property="og:type" content="restaurant">
+  <meta property="og:title" content="{{ restaurant.name }} · {{ restaurant.tagline }}">
+  <meta property="og:description" content="Cocina de lonja, sal y calma frente al Mediterráneo.">
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/hero-mar.webp' %}">
+
+  {# Marca que hay JS antes de pintar: evita destellos en las animaciones de aparición #}
+  <script>document.documentElement.classList.replace('no-js', 'js');</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="{% static 'css/bruma.css' %}">
+  {% block head_extra %}{% endblock %}
+</head>
+<body class="min-h-dvh overflow-x-clip">
+  <a href="#contenido" class="sr-only z-[60] rounded-full bg-abisal px-5 py-3 text-espuma focus:not-sr-only focus:fixed focus:top-4 focus:left-4">Saltar al contenido</a>
+
+  {% include "components/navbar.html" %}
+
+  <main id="contenido">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "components/footer.html" %}
+
+  <script type="module" src="{% static 'js/main.js' %}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

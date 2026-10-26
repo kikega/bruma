@@ -1,0 +1,15 @@
+[project]
+name = "bruma"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=6.1.2",
+    "django-environ>=0.14.0",
+    "django-meta>=2.5.1",
+    "django-robots>=6.1",
+    "gunicorn>=26.2.0",
+    "pillow>=13.0.0",
+    "psycopg>=3.3.6",
+    "python-dotenv>=1.2.4",
+]

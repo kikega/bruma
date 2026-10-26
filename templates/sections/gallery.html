@@ -1,0 +1,84 @@
+{# Galería · cuadrícula asimétrica + lightbox modal nativo (<dialog closedby="any">) #}
+<section id="galeria" class="relative overflow-clip bg-bruma-100 py-24 sm:py-32" aria-labelledby="galeria-title">
+  <div class="mx-auto max-w-6xl px-6">
+    <header class="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+      <div>
+        <p class="eyebrow" data-reveal>Galería</p>
+        <h2 id="galeria-title" class="section-title mt-5" data-reveal>
+          Instantes <em class="font-normal text-mediterraneo">entre la bruma</em>
+        </h2>
+      </div>
+      <p class="max-w-md text-sm leading-relaxed text-tinta/70 sm:text-base" data-reveal>
+        La luz de nuestra sala, el producto de la lonja y el ritmo pausado del Mediterráneo. Pulsa sobre cualquier imagen para ampliarla.
+      </p>
+    </header>
+
+    {% if gallery_images %}
+      <ul class="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3" role="list" data-gallery>
+        {% for item in gallery_images %}
+          <li class="{% if forloop.first or forloop.counter == 4 %}sm:col-span-2 lg:col-span-2{% endif %}" data-reveal>
+            <button type="button"
+                    class="group relative block aspect-[16/10] w-full overflow-clip rounded-bruma bg-bruma text-left shadow-bruma focus-visible:ring-4 focus-visible:ring-mediterraneo"
+                    data-gallery-open="{{ forloop.counter0 }}"
+                    data-src="{{ item.image.url }}"
+                    data-alt="{{ item.alt_text }}"
+                    data-title="{{ item.title }}"
+                    data-caption="{{ item.caption }}"
+                    aria-label="Ampliar imagen: {{ item.title }}">
+              <img src="{{ item.image.url }}" alt="{{ item.alt_text }}"
+                   loading="lazy" decoding="async"
+                   class="h-full w-full object-cover transition-transform duration-700 ease-marea group-hover:scale-105">
+              <span class="pointer-events-none absolute inset-0 bg-gradient-to-t from-abisal/75 via-abisal/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100" aria-hidden="true"></span>
+              <span class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-espuma opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+                <span>
+                  <strong class="block font-serif text-2xl font-medium">{{ item.title }}</strong>
+                  {% if item.caption %}<span class="mt-0.5 block text-xs text-espuma/80">{{ item.caption }}</span>{% endif %}
+                </span>
+                <span class="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-white/30 bg-abisal/50" aria-hidden="true">
+                  <svg class="size-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" d="M4 12v4h4M16 8V4h-4M4 16l5-5M16 4l-5 5"/></svg>
+                </span>
+              </span>
+            </button>
+          </li>
+        {% endfor %}
+      </ul>
+
+      {# Lightbox modal nativo con light-dismiss declarativo (closedby="any") #}
+      <dialog id="gallery-lightbox" class="lightbox" closedby="any" aria-labelledby="lightbox-title">
+        <div class="mx-auto flex h-full max-w-6xl flex-col justify-between p-4 sm:p-8" data-lightbox-shell>
+          <div class="flex items-center justify-between gap-4">
+            <p class="font-sans text-xs font-semibold tracking-editorial text-arena uppercase" aria-live="polite" data-lightbox-counter>1 / {{ gallery_images|length }}</p>
+            <button type="button" class="inline-flex size-11 items-center justify-center rounded-full border border-white/20 bg-abisal/70 text-espuma transition-colors hover:border-arena hover:text-arena"
+                    data-lightbox-close aria-label="Cerrar galería (Esc)">
+              <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+          </div>
+
+          <div class="relative my-auto flex items-center justify-center py-4">
+            <button type="button" class="absolute left-0 z-10 inline-flex size-12 items-center justify-center rounded-full border border-white/20 bg-abisal/75 text-espuma transition-colors hover:border-arena hover:text-arena sm:left-2"
+                    data-lightbox-prev aria-label="Imagen anterior">
+              <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+
+            <figure class="mx-auto max-h-[76dvh] text-center">
+              <img src="" alt="" class="lightbox-img mx-auto max-h-[68dvh] w-auto rounded-bruma object-contain shadow-2xl" data-lightbox-img>
+              <figcaption class="mt-4">
+                <h3 id="lightbox-title" class="font-serif text-2xl font-medium text-espuma sm:text-3xl" data-lightbox-title></h3>
+                <p class="mt-1 text-sm text-espuma/70" data-lightbox-caption></p>
+              </figcaption>
+            </figure>
+
+            <button type="button" class="absolute right-0 z-10 inline-flex size-12 items-center justify-center rounded-full border border-white/20 bg-abisal/75 text-espuma transition-colors hover:border-arena hover:text-arena sm:right-2"
+                    data-lightbox-next aria-label="Imagen siguiente">
+              <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+
+          <p class="text-center text-xs text-espuma/45">Usa las flechas del teclado para navegar o pulsa fuera de la imagen para cerrar</p>
+        </div>
+      </dialog>
+    {% else %}
+      <p class="mt-12 text-tinta/60">Próximamente nuevas imágenes en nuestra galería.</p>
+    {% endif %}
+  </div>
+</section>

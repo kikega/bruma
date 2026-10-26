@@ -1,0 +1,20 @@
+{# Indicadores de alérgenos con icono PNG. Uso: {% include "components/allergen_badges.html" with allergens=dish.allergens.all %} #}
+{% if allergens %}
+  <ul class="flex flex-wrap gap-1.5" role="list" aria-label="Alérgenos">
+    {% for allergen in allergens %}
+      <li class="allergen" title="{{ allergen.name }}">
+        {% if allergen.image %}
+          <img src="{{ allergen.image.url }}"
+               alt=""
+               loading="lazy"
+               decoding="async"
+               class="size-5 object-contain"
+               aria-hidden="true">
+        {% else %}
+          <span aria-hidden="true">{{ allergen.abbreviation }}</span>
+        {% endif %}
+        <span class="sr-only">{{ allergen.name }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}

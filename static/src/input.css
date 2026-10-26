@@ -1,0 +1,444 @@
+/* ==========================================================================
+   Bruma · Hoja de estilos principal (Tailwind CSS v4)
+   Compilar:  npm run build:css   ·   Desarrollo:  npm run watch:css
+   ========================================================================== */
+
+@import 'tailwindcss' source(none);
+@config '../../tailwind.config.mjs';
+
+@source '../../templates';
+@source '../../core/templates';
+@source '../../menu/templates';
+@source '../../gallery/templates';
+@source '../../reservations/templates';
+@source '../js';
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+@layer base {
+  :root {
+    color-scheme: light;
+    --nav-height: 5.5rem;
+  }
+
+  html {
+    scroll-padding-top: var(--nav-height);
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    @apply bg-espuma font-sans text-tinta antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-serif text-balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    @apply bg-arena/40 text-abisal;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-mediterraneo;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Componentes
+   -------------------------------------------------------------------------- */
+@layer components {
+  /* Cristal esmerilado (efecto bruma) */
+  .glass {
+    @apply border border-white/50 bg-espuma/60 shadow-glass;
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(140%);
+  }
+
+  .glass-dark {
+    @apply border border-white/10 bg-abisal/55;
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    backdrop-filter: blur(12px) saturate(120%);
+  }
+
+  /* Etiqueta editorial sobre los títulos */
+  .eyebrow {
+    @apply inline-flex items-center gap-3 font-sans text-[0.7rem] font-semibold uppercase tracking-editorial text-salvia-dark;
+  }
+  .eyebrow::before {
+    content: '';
+    @apply h-px w-8 bg-current;
+  }
+
+  .section-title {
+    @apply font-serif text-4xl leading-[1.05] font-medium text-abisal sm:text-5xl lg:text-6xl;
+  }
+
+  /* Botones */
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-wide
+      transition-[background-color,color,box-shadow,transform] duration-300 ease-marea
+      active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-arena {
+    @apply bg-arena text-abisal shadow-[0_8px_24px_-10px_rgb(194_178_128/0.9)] hover:bg-arena-dorada hover:shadow-[0_12px_28px_-10px_rgb(212_175_55/0.9)];
+  }
+  .btn-ghost {
+    @apply border border-abisal/25 text-abisal hover:border-abisal/60 hover:bg-white/50;
+  }
+  .btn-ghost-light {
+    @apply border border-white/30 text-espuma hover:border-arena hover:text-arena;
+  }
+
+  /* Enlaces de navegación con subrayado animado */
+  .nav-link {
+    @apply relative py-2 text-sm font-medium text-abisal/80 transition-colors duration-300 hover:text-abisal;
+  }
+  .nav-link::after {
+    content: '';
+    @apply absolute inset-x-0 bottom-1 h-px origin-left scale-x-0 bg-arena transition-transform duration-300 ease-marea;
+  }
+  .nav-link:hover::after,
+  .nav-link[aria-current='true']::after {
+    @apply scale-x-100;
+  }
+
+  /* Marco de imagen con parallax */
+  .parallax-frame {
+    @apply relative overflow-clip rounded-bruma bg-bruma shadow-bruma;
+  }
+  .parallax-frame > img {
+    @apply absolute inset-x-0 -top-[12%] h-[124%] w-full object-cover;
+  }
+
+  /* ---- Carta ---- */
+  .menu-tab {
+    @apply shrink-0 snap-start rounded-full border border-abisal/15 px-4 py-2 text-sm font-medium whitespace-nowrap text-abisal/70
+      transition-[background-color,color,border-color] duration-300 ease-marea hover:border-abisal/40 hover:text-abisal;
+  }
+  .menu-tab[aria-selected='true'] {
+    @apply border-abisal bg-abisal text-espuma;
+  }
+
+  .allergen {
+    @apply inline-flex size-7 items-center justify-center overflow-hidden rounded-full border border-salvia/50 bg-white/80 text-[0.6rem] font-semibold tracking-wide text-salvia-dark shadow-xs;
+  }
+
+  /* ---- Formulario de reservas ---- */
+  .field-label {
+    @apply mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-arena-light;
+  }
+  .field-control {
+    @apply block w-full rounded-xl border border-white/15 bg-white/[0.06] px-4 py-3 text-base text-espuma placeholder:text-espuma/35
+      transition-[border-color,background-color,box-shadow] duration-200
+      focus:border-arena focus:bg-white/10 focus:shadow-[0_0_0_3px_rgb(194_178_128/0.25)] focus:outline-none;
+  }
+  select.field-control {
+    @apply appearance-none bg-no-repeat pr-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23C2B280'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z'/%3E%3C/svg%3E");
+    background-position: right 0.85rem center;
+    background-size: 1.1rem;
+  }
+  select.field-control option,
+  select.field-control optgroup {
+    @apply bg-abisal text-espuma;
+  }
+  .field-control[type='date']::-webkit-calendar-picker-indicator {
+    filter: invert(78%) sepia(18%) saturate(500%) hue-rotate(5deg);
+    cursor: pointer;
+  }
+
+  /* Error sólo tras interacción (:user-invalid) o error devuelto por el servidor */
+  .field-control:user-invalid,
+  .field-control.is-invalid {
+    @apply border-[#F2A69B] bg-[#F2A69B]/10;
+  }
+  .field-control:user-valid:not(.is-invalid) {
+    @apply border-salvia-light/70;
+  }
+  .field-error {
+    @apply mt-2 flex items-start gap-1.5 text-sm text-[#F5B8AE];
+  }
+  .field-error:empty {
+    display: none;
+  }
+
+  .spinner {
+    @apply inline-block size-4 rounded-full border-2 border-current border-r-transparent;
+    animation: bruma-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes bruma-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes bruma-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Capas de bruma animada (sólo transform → composición en GPU)
+   -------------------------------------------------------------------------- */
+.mist-layer {
+  position: absolute;
+  inset: -20% -30%;
+  pointer-events: none;
+  will-change: transform;
+  background:
+    radial-gradient(40% 28% at 20% 55%, rgb(248 249 250 / 0.75), transparent 70%),
+    radial-gradient(35% 22% at 70% 62%, rgb(226 232 240 / 0.7), transparent 70%),
+    radial-gradient(50% 30% at 50% 78%, rgb(248 249 250 / 0.55), transparent 72%);
+}
+.mist-layer--far {
+  opacity: 0.7;
+  background:
+    radial-gradient(45% 25% at 80% 40%, rgb(248 249 250 / 0.6), transparent 70%),
+    radial-gradient(38% 20% at 30% 48%, rgb(226 232 240 / 0.65), transparent 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mist-layer {
+    animation: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Parallax con Scroll-Driven Animations (mejora progresiva)
+   Cada [data-parallax] se desplaza entre --parallax-from y --parallax-to
+   según la posición en pantalla de su [data-parallax-scope] más cercano.
+   Navegadores sin soporte → fallback ligero en static/js/modules/parallax.js
+   -------------------------------------------------------------------------- */
+[data-parallax-scope] {
+  view-timeline-name: --parallax;
+}
+
+[data-parallax] {
+  will-change: transform;
+}
+
+@keyframes bruma-parallax {
+  from {
+    transform: translate3d(0, var(--parallax-from, 0), 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(0, var(--parallax-to, 0), 0);
+    opacity: var(--parallax-fade-to, 1);
+  }
+}
+
+@supports ((animation-timeline: view()) and (animation-range: entry)) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-parallax] {
+      animation: bruma-parallax linear both;
+      animation-timeline: --parallax;
+      animation-range: cover 0% cover 100%;
+    }
+    [data-parallax-range='exit'] {
+      animation-range: exit 0% exit 100%;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Aparición al hacer scroll (sólo si hay JS, para no ocultar contenido)
+   -------------------------------------------------------------------------- */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] {
+    transform: none;
+    transition: opacity 0.4s ease;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Navbar: estado al hacer scroll
+   -------------------------------------------------------------------------- */
+#site-nav .nav-shell {
+  transition:
+    background-color 0.4s ease,
+    box-shadow 0.4s ease,
+    padding 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#site-nav[data-scrolled='true'] .nav-shell {
+  background-color: rgb(248 249 250 / 0.78);
+  box-shadow: 0 12px 40px -16px rgb(15 30 46 / 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   Carta: transición entre categorías y modal de categoría completa
+   -------------------------------------------------------------------------- */
+.menu-panel.is-entering {
+  animation: bruma-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.menu-tabs-scroller {
+  scrollbar-width: none;
+}
+.menu-tabs-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.menu-modal {
+  max-width: min(64rem, calc(100vw - 2rem));
+  max-height: 88dvh;
+  width: 100%;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overscroll-behavior: contain;
+}
+.menu-modal::backdrop {
+  background: rgb(11 23 36 / 0.72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.menu-modal[open] {
+  animation: bruma-fade-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Vista previa flotante centrada (plato o etiqueta de vino) en Top Layer con fade-in / fade-out */
+.dish-preview-popover {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(26rem, calc(100vw - 2rem));
+  height: fit-content;
+  max-height: 82dvh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  z-index: 90;
+  pointer-events: none;
+
+  opacity: 0;
+  transform: scale(0.94) translate3d(0, 8px, 0);
+  transition-property: opacity, transform, display, overlay;
+  transition-duration: 0.32s;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-behavior: allow-discrete;
+}
+
+.dish-preview-popover[data-dish-kind='wine'] {
+  width: min(21rem, calc(100vw - 2rem));
+}
+
+.dish-preview-popover[data-dish-kind='wine'] .dish-preview-img {
+  object-fit: contain;
+  max-height: 58dvh;
+}
+
+.dish-preview-popover:is(:popover-open, .is-open):where(:not([data-closing])) {
+  opacity: 1;
+  transform: scale(1) translate3d(0, 0, 0);
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.94) translate3d(0, 8px, 0);
+  }
+}
+
+.dish-preview-popover[data-pinned='true'] {
+  pointer-events: auto;
+}
+
+.dish-preview-close {
+  display: none;
+}
+
+.dish-preview-popover[data-pinned='true'] .dish-preview-close {
+  display: inline-flex;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dish-preview-popover {
+    transform: none;
+    transition-duration: 0.1s;
+  }
+
+  @starting-style {
+    .dish-preview-popover:is(:popover-open, .is-open):where(:not([data-closing])) {
+      transform: none;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Galería (lightbox con <dialog>)
+   -------------------------------------------------------------------------- */
+.lightbox {
+  max-width: 100vw;
+  max-height: 100dvh;
+  width: 100vw;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #F8F9FA;
+  overscroll-behavior: contain;
+}
+.lightbox::backdrop {
+  background: rgb(11 23 36 / 0.88);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.lightbox[open] {
+  animation: bruma-fade-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.lightbox-img.is-changing {
+  animation: bruma-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-panel.is-entering,
+  .menu-modal[open],
+  .lightbox[open],
+  .lightbox-img.is-changing {
+    animation-duration: 0.01ms;
+  }
+}
+
+/* Confirmación de reserva */
+.confirmation-enter {
+  animation: bruma-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}

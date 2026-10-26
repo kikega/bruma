@@ -1,0 +1,209 @@
+{# Reservas · fondo Azul abisal (#0F1E2E) con detalles en color arena y validación reactiva #}
+<section id="reservas" class="relative overflow-clip bg-abisal py-24 text-espuma sm:py-32" aria-labelledby="reservas-title">
+  <div class="pointer-events-none absolute -top-32 left-1/2 h-80 w-[44rem] -translate-x-1/2 rounded-full bg-mediterraneo/25 blur-3xl" aria-hidden="true"></div>
+
+  <div class="relative mx-auto max-w-6xl px-6">
+    <div class="grid gap-14 lg:grid-cols-12 lg:gap-12">
+      {# Columna informativa #}
+      <div class="lg:col-span-5">
+        <p class="eyebrow !text-arena" data-reveal>Reservas</p>
+        <h2 id="reservas-title" class="mt-5 font-serif text-4xl leading-[1.05] font-medium text-espuma sm:text-5xl lg:text-6xl" data-reveal>
+          Reserva <em class="font-normal text-arena">tu mesa</em> frente al mar
+        </h2>
+        <p class="mt-6 text-base leading-relaxed text-espuma/75" data-reveal>
+          Te recomendamos reservar con antelación, especialmente los fines de semana y para nuestra Terraza Bruma. Si sois un grupo de 10 o más comensales, nuestro equipo confirmará personalmente los detalles de vuestra mesa.
+        </p>
+
+        <dl class="mt-10 space-y-6 border-t border-white/10 pt-8 text-sm" data-reveal>
+          <div class="flex gap-4">
+            <dt class="w-28 shrink-0 font-semibold tracking-wider text-arena uppercase">Mediodía</dt>
+            <dd class="text-espuma/80">13:30 – 15:30 (cocina hasta las 16:00)</dd>
+          </div>
+          <div class="flex gap-4">
+            <dt class="w-28 shrink-0 font-semibold tracking-wider text-arena uppercase">Noche</dt>
+            <dd class="text-espuma/80">20:30 – 22:30 (martes a sábado)</dd>
+          </div>
+          <div class="flex gap-4">
+            <dt class="w-28 shrink-0 font-semibold tracking-wider text-arena uppercase">Zonas</dt>
+            <dd class="text-espuma/80">Salón Interior · Terraza Bruma · Barra gastronómica</dd>
+          </div>
+          <div class="flex gap-4">
+            <dt class="w-28 shrink-0 font-semibold tracking-wider text-arena uppercase">Teléfono</dt>
+            <dd><a href="tel:{{ restaurant.phone_href }}" class="text-espuma transition-colors hover:text-arena">{{ restaurant.phone }}</a></dd>
+          </div>
+        </dl>
+      </div>
+
+      {# Columna del formulario #}
+      <div class="lg:col-span-7">
+        <div class="glass-dark rounded-bruma p-6 shadow-2xl sm:p-10" data-reveal>
+          {% if messages %}
+          <div class="mb-6 space-y-2" role="status">
+            {% for message in messages %}
+            <p class="rounded-xl border border-arena/40 bg-arena/10 px-4 py-3 text-sm text-espuma">{{ message }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <form id="reservation-form" method="post" action="{% url 'reservations:create' %}" data-availability-url="{% url 'reservations:availability' %}" novalidate>
+            {% csrf_token %}
+
+            {# Alerta general (p. ej. sin disponibilidad o fallo de red) #}
+            <div class="mb-6 rounded-xl border border-[#F2A69B]/50 bg-[#F2A69B]/10 px-4 py-3 text-sm text-[#F5B8AE]" role="alert" data-form-alert hidden></div>
+
+            <div class="grid gap-5 sm:grid-cols-2">
+              {# Nombre completo #}
+              <div class="sm:col-span-2">
+                <label for="id_full_name" class="field-label">Nombre completo <span class="text-arena" aria-hidden="true">*</span></label>
+                <input type="text" id="id_full_name" name="full_name" required minlength="3" maxlength="120" autocomplete="name" placeholder="Ej. Elena Navarro" class="field-control" aria-errormessage="err-full_name" data-msg-missing="Indica tu nombre completo." data-msg-short="El nombre debe tener al menos 3 caracteres.">
+                <p id="err-full_name" class="field-error" data-error-for="full_name" role="status" aria-live="polite"></p>
+              </div>
+
+              {# Email — pista de formato encima del campo para que el autocompletado no la tape #}
+              <div>
+                <label for="id_email" class="field-label">Email <span class="text-arena" aria-hidden="true">*</span></label>
+                <span id="hint-email" class="mb-1.5 block text-xs text-espuma/50">Formato: nombre@dominio.com</span>
+                <input type="email" id="id_email" name="email" required autocomplete="email" inputmode="email" placeholder="elena@ejemplo.com" class="field-control" aria-describedby="hint-email" aria-errormessage="err-email" data-msg-missing="Indica tu email para enviarte la confirmación." data-msg-type="Introduce un email válido (nombre@dominio.com).">
+                <p id="err-email" class="field-error" data-error-for="email" role="status" aria-live="polite"></p>
+              </div>
+
+              {# Teléfono #}
+              <div>
+                <label for="id_phone" class="field-label">Teléfono <span class="text-arena" aria-hidden="true">*</span></label>
+                <span id="hint-phone" class="mb-1.5 block text-xs text-espuma/50">Mínimo 9 dígitos (con o sin prefijo +34)</span>
+                <input type="tel" id="id_phone" name="phone" required autocomplete="tel" inputmode="tel" pattern="^\+?[0-9][0-9\s\-]{7,16}$" placeholder="+34 600 000 000" class="field-control" aria-describedby="hint-phone" aria-errormessage="err-phone" data-msg-missing="Indica un teléfono de contacto." data-msg-pattern="Introduce un teléfono válido (mínimo 9 dígitos).">
+                <p id="err-phone" class="field-error" data-error-for="phone" role="status" aria-live="polite"></p>
+              </div>
+
+              {# Fecha #}
+              <div>
+                <label for="id_date" class="field-label">Fecha <span class="text-arena" aria-hidden="true">*</span></label>
+                <input type="date" id="id_date" name="date" required min="{{ reservation_min_date }}" max="{{ reservation_max_date }}" value="{{ reservation_min_date }}" class="field-control" aria-errormessage="err-date" data-msg-missing="Selecciona una fecha." data-msg-underflow="La fecha no puede ser anterior a hoy." data-msg-overflow="Aceptamos reservas hasta {{ reservation_max_days }} días vista.">
+                <p id="err-date" class="field-error" data-error-for="date" role="status" aria-live="polite"></p>
+              </div>
+
+              {# Turno / Hora agrupado #}
+              <div>
+                <label for="id_time" class="field-label">Turno / Hora <span class="text-arena" aria-hidden="true">*</span></label>
+                <select id="id_time" name="time" required class="field-control" aria-errormessage="err-time" data-msg-missing="Selecciona un turno y hora.">
+                  <option value="">Selecciona una hora</option>
+                  <optgroup label="Mediodía: 13:30 - 15:30">
+                    <option value="13:30">13:30</option>
+                    <option value="14:00">14:00</option>
+                    <option value="14:30">14:30</option>
+                    <option value="15:00">15:00</option>
+                    <option value="15:30">15:30</option>
+                  </optgroup>
+                  <optgroup label="Noche: 20:30 - 22:30">
+                    <option value="20:30">20:30</option>
+                    <option value="21:00">21:00</option>
+                    <option value="21:30">21:30</option>
+                    <option value="22:00">22:00</option>
+                    <option value="22:30">22:30</option>
+                  </optgroup>
+                </select>
+                <p id="err-time" class="field-error" data-error-for="time" role="status" aria-live="polite"></p>
+              </div>
+
+              {# Comensales (1 a 10+) #}
+              <div>
+                <label for="id_party_size" class="field-label">Comensales <span class="text-arena" aria-hidden="true">*</span></label>
+                <select id="id_party_size" name="party_size" required class="field-control" aria-errormessage="err-party_size" data-msg-missing="Indica el número de comensales.">
+                  <option value="">Número de comensales</option>
+                  <option value="1">1 persona</option>
+                  <option value="2" selected>2 personas</option>
+                  <option value="3">3 personas</option>
+                  <option value="4">4 personas</option>
+                  <option value="5">5 personas</option>
+                  <option value="6">6 personas</option>
+                  <option value="7">7 personas</option>
+                  <option value="8">8 personas</option>
+                  <option value="9">9 personas</option>
+                  <option value="10">10+ personas (grupo)</option>
+                </select>
+                <p id="err-party_size" class="field-error" data-error-for="party_size" role="status" aria-live="polite"></p>
+              </div>
+
+              {# Zona preferida #}
+              <div>
+                <label for="id_zone_preference" class="field-label">Zona preferida</label>
+                <select id="id_zone_preference" name="zone_preference" class="field-control" aria-errormessage="err-zone_preference">
+                  <option value="indiferente" selected>Indiferente</option>
+                  <option value="interior">Mesa Salón</option>
+                  <option value="terraza">Barra Bruma</option>
+                </select>
+                <p id="err-zone_preference" class="field-error" data-error-for="zone_preference" role="status" aria-live="polite"></p>
+              </div>
+
+              {# Indicador en tiempo real de disponibilidad según la ocupación en BD #}
+              <div class="sm:col-span-2" data-availability-box hidden>
+                <p class="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs text-espuma/80" role="status" aria-live="polite" data-availability-text></p>
+              </div>
+
+              {# Observaciones / Alergias #}
+              <div class="sm:col-span-2">
+                <label for="id_notes" class="field-label">Observaciones / Alergias <span class="font-normal text-espuma/45">(opcional)</span></label>
+                <textarea id="id_notes" name="notes" rows="3" maxlength="600" placeholder="Alergias o intolerancias, carrito de bebé, celebración especial…" class="field-control"></textarea>
+              </div>
+            </div>
+
+            <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <p class="text-xs text-espuma/50">Sin cargos por reserva. Cancelación gratuita hasta 6 h antes.</p>
+              <button type="submit" class="btn btn-arena min-w-52 px-8" data-submit-btn>
+                <span class="spinner" data-submit-spinner hidden aria-hidden="true"></span>
+                <span data-submit-label>Confirmar reserva</span>
+              </button>
+            </div>
+          </form>
+
+          {# Tarjeta de confirmación (oculta hasta completar la reserva) #}
+          <div id="reservation-confirmation" class="confirmation-enter" role="region" aria-labelledby="confirm-heading" tabindex="-1" hidden>
+            <div class="flex items-center gap-3 text-arena">
+              <span class="inline-flex size-10 items-center justify-center rounded-full border border-arena/40 bg-arena/15" aria-hidden="true">
+                <svg class="size-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 111.4-1.4L8 12.58l7.3-7.3a1 1 0 011.4 0z" clip-rule="evenodd" />
+                </svg>
+              </span>
+              <p class="text-xs font-semibold tracking-editorial uppercase" data-confirm-status>Reserva confirmada</p>
+            </div>
+
+            <h3 id="confirm-heading" class="mt-4 font-serif text-3xl font-medium text-espuma sm:text-4xl">
+              Gracias, <span data-confirm-field="full_name"></span>
+            </h3>
+            <p class="mt-2 text-sm leading-relaxed text-espuma/75" data-confirm-lead>
+              Te esperamos en Bruma. Hemos registrado tu mesa con el siguiente resumen:
+            </p>
+
+            <dl class="mt-6 grid grid-cols-2 gap-4 rounded-bruma border border-white/10 bg-white/[0.04] p-5 text-sm sm:grid-cols-3">
+              <div>
+                <dt class="text-xs text-arena-light uppercase">Localizador</dt>
+                <dd class="mt-1 font-mono text-base font-semibold tracking-wider text-espuma" data-confirm-field="code"></dd>
+              </div>
+              <div>
+                <dt class="text-xs text-arena-light uppercase">Fecha y hora</dt>
+                <dd class="mt-1 font-medium text-espuma"><span data-confirm-field="date"></span> · <span data-confirm-field="time"></span></dd>
+              </div>
+              <div>
+                <dt class="text-xs text-arena-light uppercase">Comensales</dt>
+                <dd class="mt-1 font-medium text-espuma" data-confirm-field="party_size"></dd>
+              </div>
+              <div>
+                <dt class="text-xs text-arena-light uppercase">Zona asignada</dt>
+                <dd class="mt-1 font-medium text-espuma" data-confirm-field="area"></dd>
+              </div>
+              <div class="col-span-2">
+                <dt class="text-xs text-arena-light uppercase">Contacto</dt>
+                <dd class="mt-1 truncate text-espuma/80"><span data-confirm-field="email"></span> · <span data-confirm-field="phone"></span></dd>
+              </div>
+            </dl>
+
+            <div class="mt-8 flex flex-wrap items-center justify-between gap-4">
+              <p class="text-xs text-espuma/55">Guarda tu localizador por si necesitas modificar o cancelar la reserva.</p>
+              <button type="button" class="btn btn-ghost-light" data-new-reservation>Hacer otra reserva</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

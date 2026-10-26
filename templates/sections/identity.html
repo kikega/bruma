@@ -1,0 +1,39 @@
+{% load static %}
+{# Nuestra identidad · storytelling asimétrico con imágenes en parallax #}
+<section id="identidad" class="relative overflow-clip bg-espuma py-24 sm:py-32" aria-labelledby="identidad-title">
+  <div class="mx-auto grid max-w-6xl items-center gap-14 px-6 lg:grid-cols-12 lg:gap-10">
+    {# Columna de imágenes (composición superpuesta) #}
+    <div class="relative order-2 lg:order-1 lg:col-span-6">
+      <div class="parallax-frame aspect-[4/5] w-[82%]" data-parallax-scope data-reveal>
+        <img src="{% static 'img/identidad-lonja.webp' %}" alt="Gamba roja, lubina y pulpo frescos sobre hielo en la lonja al amanecer"
+             width="896" height="1200" loading="lazy" decoding="async" data-parallax style="--parallax-from: -8%; --parallax-to: 8%">
+      </div>
+      <div class="parallax-frame absolute -bottom-10 right-0 aspect-[4/5] w-[48%] border-8 border-espuma" data-parallax-scope data-reveal style="--reveal-delay: 150ms">
+        <img src="{% static 'img/identidad-plato.webp' %}" alt="Carpaccio de gamba roja con cítricos y aceite de oliva sobre plato de cerámica"
+             width="896" height="1200" loading="lazy" decoding="async" data-parallax style="--parallax-from: -14%; --parallax-to: 14%">
+      </div>
+      <p class="absolute -top-6 -left-2 hidden font-serif text-[9rem] leading-none text-bruma select-none lg:block" aria-hidden="true">01</p>
+    </div>
+
+    {# Columna de texto #}
+    <div class="order-1 lg:order-2 lg:col-span-6 lg:pl-8">
+      <p class="eyebrow" data-reveal>Nuestra identidad</p>
+      <h2 id="identidad-title" class="section-title mt-5" data-reveal>
+        La lonja, el mar <em class="font-normal text-mediterraneo">y la pasión</em> por la cocina
+      </h2>
+      <div class="mt-8 space-y-5 text-base leading-relaxed text-tinta/80 sm:text-lg" data-reveal>
+        <p>
+          Bruma es mucho más que un restaurante; es el reflejo de nuestra profunda pasión por la cocina gourmet. Cada plato que ofrecemos es el resultado de una cuidadosa selección de ingredientes frescos y de alta calidad, combinados con técnicas culinarias innovadoras y el amor por el arte de cocinar. Nos inspiramos en la riqueza de los sabores tradicionales, pero buscamos constantemente nuevas maneras de sorprender y deleitar a nuestros comensales, creando experiencias gastronómicas únicas e inolvidables.
+        </p>
+        <p>
+          En Bruma, creemos que cada comida debe ser un viaje sensorial, un momento para disfrutar, compartir y conectar. Nuestro compromiso es brindar un ambiente acogedor y elegante, donde la atención personalizada y la excelencia en cada detalle hagan que cada visita sea especial. Ven y descubre cómo la pasión y la creatividad se unen en cada plato para ofrecerte lo mejor de la cocina gourmet.
+        </p>
+      </div>
+      <blockquote class="mt-10 border-l-2 border-arena pl-6" data-reveal>
+        <p class="font-serif text-2xl leading-snug text-abisal italic sm:text-3xl">
+          «En Bruma, cada bocado es una celebración de la pasión y el sabor que nos define.»
+        </p>
+      </blockquote>
+    </div>
+  </div>
+</section>
