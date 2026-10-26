@@ -1,4 +1,4 @@
-"""Modelos de La Carta: categorías, platos y alérgenos."""
+"""Modelos de La Carta y La Bodega: categorías, platos, vinos y alérgenos."""
 
 from django.db import models
 
@@ -31,7 +31,7 @@ class Allergen(models.Model):
 
 class CategoryQuerySet(models.QuerySet):
     def active(self):
-        return self.filter(is_active=True)
+        return self.filter(is_active=True).exclude(slug='bodega-mediterranea')
 
     def with_active_dishes(self):
         """Categorías activas con sus platos activos y alérgenos precargados (sin N+1)."""
@@ -98,18 +98,18 @@ class Dish(models.Model):
     description = models.CharField('descripción sensorial', max_length=280, blank=True)
     detail = models.CharField(
         'detalle', max_length=80, blank=True,
-        help_text='Información secundaria: D.O., formato (copa/botella), peso, unidades…',
+        help_text='Información secundaria: peso, unidades, mínimo de comensales…',
     )
     price = models.DecimalField('precio (€)', max_digits=7, decimal_places=2)
     price_unit = models.CharField(
         'unidad de precio', max_length=30, blank=True,
-        help_text='Opcional: «/ud», «/kg», «por persona», «botella»…',
+        help_text='Opcional: «/ud», «/kg», «por persona»…',
     )
     image = models.ImageField(
-        'imagen del plato / etiqueta',
+        'imagen del plato',
         upload_to='carta/%Y/',
         blank=True,
-        help_text='Fotografía del plato o etiqueta de la botella de vino.',
+        help_text='Fotografía del plato.',
     )
     allergens = models.ManyToManyField(Allergen, blank=True, related_name='dishes', verbose_name='alérgenos')
     is_signature = models.BooleanField('plato de autor', default=False)
@@ -125,3 +125,136 @@ class Dish(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class WineQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
+
+    def with_allergens(self):
+        """Vinos activos con sus alérgenos precargados (sin N+1)."""
+        return self.active().prefetch_related('allergens')
+
+    def grouped_by_type(self, *, landing_limit=6):
+        """Agrupa los vinos activos por tipo de vino siguiendo el orden editorial de La Bodega."""
+        wines = list(self.with_allergens().order_by('order', 'name'))
+        by_type = {}
+        for wine in wines:
+            by_type.setdefault(wine.wine_type, []).append(wine)
+
+        groups = []
+        for code, label in Wine.WineType.choices:
+            items = by_type.get(code, [])
+            if not items:
+                continue
+            meta = Wine.TYPE_EDITORIAL_META.get(code, {})
+            groups.append({
+                'slug': code,
+                'name': meta.get('plural', str(label)),
+                'singular': str(label),
+                'tagline': meta.get('tagline', ''),
+                'wines': items,
+                'landing_wines': items[:landing_limit],
+                'has_more_wines': len(items) > landing_limit,
+                'extra_wines_count': max(0, len(items) - landing_limit),
+            })
+        return groups
+
+
+class Wine(models.Model):
+    """Referencia vinícola de La Bodega de Bruma, separada de los platos de La Carta."""
+
+    class WineType(models.TextChoices):
+        WHITE = 'blanco', 'Vino Blanco'
+        RED = 'tinto', 'Vino Tinto'
+        SPARKLING = 'espumoso', 'Espumoso y Champagne'
+        ROSE = 'rosado', 'Vino Rosado'
+        FORTIFIED = 'generoso', 'Generoso y Dulce'
+
+    TYPE_EDITORIAL_META = {
+        WineType.WHITE: {
+            'plural': 'Blancos',
+            'tagline': 'Blancos salinos, minerales y atlánticos pensados para el mar',
+        },
+        WineType.RED: {
+            'plural': 'Tintos',
+            'tagline': 'Tintos mediterráneos de finura, frescura y suelos de pizarra o arcilla',
+        },
+        WineType.SPARKLING: {
+            'plural': 'Espumosos y Champagne',
+            'tagline': 'Burbujas finas de larga crianza en rima y terruños calcáreos',
+        },
+        WineType.ROSE: {
+            'plural': 'Rosados',
+            'tagline': 'Rosados pálidos de sangrado directo y brisa mediterránea',
+        },
+        WineType.FORTIFIED: {
+            'plural': 'Generosos y Dulces',
+            'tagline': 'Vinos de velo de flor, criaderas y vendimias tardías para el cierre perfecto',
+        },
+    }
+
+    name = models.CharField('nombre', max_length=120)
+    wine_type = models.CharField(
+        'tipo de vino',
+        max_length=20,
+        choices=WineType.choices,
+        default=WineType.WHITE,
+        db_index=True,
+    )
+    wine_region = models.CharField(
+        'zona vinícola',
+        max_length=120,
+        help_text='Denominación de Origen, apelación o región vinícola (p. ej. D.O. Rías Baixas, A.O.C. Champagne).',
+    )
+    varietal = models.CharField(
+        'varietal',
+        max_length=140,
+        help_text='Variedad o ensamblaje de uvas (p. ej. 100 % Albariño, Garnacha y Cariñena).',
+    )
+    description = models.CharField(
+        'descripción',
+        max_length=280,
+        blank=True,
+        help_text='Descripción del vino, origen del viñedo o método de elaboración.',
+    )
+    tasting_notes = models.TextField(
+        'notas de cata',
+        blank=True,
+        help_text='Fase visual, aromas en nariz, paso por boca y final.',
+    )
+    price = models.DecimalField('precio (€)', max_digits=7, decimal_places=2)
+    price_unit = models.CharField(
+        'formato / unidad de precio',
+        max_length=40,
+        default='Botella',
+        blank=True,
+        help_text='Formato de servicio: «Botella», «Copa / Botella», «Copa»…',
+    )
+    image = models.ImageField(
+        'imagen de botella o etiqueta',
+        upload_to='bodega/%Y/',
+        blank=True,
+        help_text='Fotografía de la botella o imagen de la etiqueta del vino.',
+    )
+    allergens = models.ManyToManyField(
+        Allergen, blank=True, related_name='wines', verbose_name='alérgenos',
+    )
+    is_signature = models.BooleanField(
+        'selección del sumiller',
+        default=False,
+        help_text='Destaca este vino como recomendación especial de nuestro sumiller.',
+    )
+    is_active = models.BooleanField('disponible', default=True)
+    order = models.PositiveSmallIntegerField('orden', default=0)
+
+    objects = WineQuerySet.as_manager()
+
+    class Meta:
+        ordering = ['wine_type', 'order', 'name']
+        verbose_name = 'vino'
+        verbose_name_plural = 'vinos'
+
+    def __str__(self):
+        return f'{self.name} ({self.wine_region})' if self.wine_region else self.name
+

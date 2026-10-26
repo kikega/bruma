@@ -4,7 +4,7 @@ from django.core.files.base import ContentFile
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Allergen, Category, Dish
+from .models import Allergen, Category, Dish, Wine
 
 
 class CategoryMenuPopupTests(TestCase):
@@ -20,6 +20,26 @@ class CategoryMenuPopupTests(TestCase):
             if with_image:
                 dish.image.save(
                     f'test-{category.slug}-{i}.svg',
+                    ContentFile(b'<svg xmlns="http://www.w3.org/2000/svg"/>'),
+                    save=True,
+                )
+
+    def _create_wines(self, wine_type, count, *, with_image=False):
+        for i in range(1, count + 1):
+            wine = Wine.objects.create(
+                name=f'Vino {wine_type} {i}',
+                wine_type=wine_type,
+                wine_region='D.O. Rías Baixas',
+                varietal='100 % Albariño',
+                description=f'Descripción del vino {i}',
+                tasting_notes=f'Notas salinas y cítricas {i}',
+                price=Decimal('32.00'),
+                price_unit='Botella',
+                order=i,
+            )
+            if with_image:
+                wine.image.save(
+                    f'test-wine-{wine_type}-{i}.svg',
                     ContentFile(b'<svg xmlns="http://www.w3.org/2000/svg"/>'),
                     save=True,
                 )
@@ -62,9 +82,9 @@ class CategoryMenuPopupTests(TestCase):
         self._create_dishes(cat_short, 4)
 
         cat_long = Category.objects.create(
-            name='Bodega',
-            slug='bodega',
-            intro='Selección de vinos mediterráneos.',
+            name='Arroces',
+            slug='arroces',
+            intro='Selección de arroces al momento.',
             order=2,
         )
         self._create_dishes(cat_long, 6)
@@ -73,27 +93,35 @@ class CategoryMenuPopupTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertNotContains(response, 'id="menu-modal-postres"')
-        self.assertContains(response, 'id="menu-modal-bodega"')
-        self.assertContains(response, 'Ver carta completa de Bodega')
-        self.assertContains(response, 'Bodega Plato 5')
-        self.assertContains(response, 'Bodega Plato 6')
+        self.assertContains(response, 'id="menu-modal-arroces"')
+        self.assertContains(response, 'Ver carta completa de Arroces')
+        self.assertContains(response, 'Arroces Plato 5')
+        self.assertContains(response, 'Arroces Plato 6')
 
-    def test_dish_and_wine_images_render_in_card_modal_and_floating_preview(self):
-        cat_wine = Category.objects.create(
-            name='Bodega Mediterránea',
-            slug='bodega-mediterranea',
-            intro='Selección de vinos mediterráneos.',
-            order=1,
-        )
-        self._create_dishes(cat_wine, 5, with_image=True)
+    def test_cellar_section_separates_wines_by_type_with_all_fields_and_preview(self):
+        self._create_wines(Wine.WineType.WHITE, 7, with_image=True)
+        self._create_wines(Wine.WineType.RED, 2, with_image=True)
+
+        groups = {g['slug']: g for g in Wine.objects.grouped_by_type()}
+        self.assertIn(Wine.WineType.WHITE, groups)
+        self.assertIn(Wine.WineType.RED, groups)
+        self.assertTrue(groups[Wine.WineType.WHITE]['has_more_wines'])
+        self.assertEqual(groups[Wine.WineType.WHITE]['extra_wines_count'], 1)
+        self.assertFalse(groups[Wine.WineType.RED]['has_more_wines'])
 
         response = self.client.get(reverse('core:home'))
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="bodega"')
+        self.assertContains(response, 'id="tab-wine-blanco"')
+        self.assertContains(response, 'id="tab-wine-tinto"')
+        self.assertContains(response, 'D.O. Rías Baixas')
+        self.assertContains(response, '100 % Albariño')
+        self.assertContains(response, 'Notas salinas y cítricas 1')
         self.assertContains(response, 'id="dish-floating-preview"')
-        self.assertContains(response, 'data-dish-preview-card')
         self.assertContains(response, 'data-dish-kind="wine"')
-        self.assertContains(response, 'Ver etiqueta de Bodega Mediterránea Plato 1')
-        self.assertContains(response, 'Ver etiqueta de Bodega Mediterránea Plato 5')
+        self.assertContains(response, 'Ver botella o etiqueta de Vino blanco 1')
+        self.assertContains(response, 'id="wine-modal-blanco"')
+        self.assertNotContains(response, 'id="wine-modal-tinto"')
 
     def test_allergen_png_image_renders_in_dish_and_legend(self):
         allergen = Allergen.objects.create(code='pescado', name='Pescado', abbreviation='PE', order=1)
@@ -106,3 +134,4 @@ class CategoryMenuPopupTests(TestCase):
         response = self.client.get(reverse('core:home'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, allergen.image.url)
+

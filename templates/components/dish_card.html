@@ -1,6 +1,6 @@
 {# Tarjeta de plato individual. Uso: {% include "components/dish_card.html" with dish=dish id_prefix="dish" category_slug=category.slug %} #}
-{% with heading_id=id_prefix|default:"dish" is_wine=category_slug|default:dish.category.slug %}
-  <li class="group relative flex flex-col rounded-bruma border border-bruma bg-white/70 p-6 transition-[box-shadow,transform,border-color] duration-500 ease-marea hover:-translate-y-0.5 hover:border-arena/50 hover:shadow-bruma{% if dish.image %} cursor-pointer{% endif %}"{% if dish.image %} data-dish-preview-card data-dish-image="{{ dish.image.url }}" data-dish-title="{{ dish.name }}" data-dish-detail="{{ dish.detail }}" data-dish-price="{{ dish.price|floatformat:'-2' }} €{% if dish.price_unit %} {{ dish.price_unit }}{% endif %}" data-dish-kind="{% if is_wine == 'bodega-mediterranea' %}wine{% else %}dish{% endif %}"{% endif %}>
+{% with heading_id=id_prefix|default:"dish" %}
+  <li class="group relative flex flex-col rounded-bruma border border-bruma bg-white/70 p-6 transition-[box-shadow,transform,border-color] duration-500 ease-marea hover:-translate-y-0.5 hover:border-arena/50 hover:shadow-bruma{% if dish.image %} cursor-pointer{% endif %}"{% if dish.image %} data-dish-preview-card data-dish-image="{{ dish.image.url }}" data-dish-title="{{ dish.name }}" data-dish-detail="{{ dish.detail }}" data-dish-price="{{ dish.price|floatformat:'-2' }} €{% if dish.price_unit %} {{ dish.price_unit }}{% endif %}" data-dish-kind="dish"{% endif %}>
     <article class="flex h-full flex-col" aria-labelledby="{{ heading_id }}-{{ dish.pk }}">
       <div class="flex items-start justify-between gap-4">
         <div class="flex items-start gap-3.5">
@@ -8,7 +8,7 @@
             <button type="button"
                     class="group/thumb relative mt-0.5 size-14 shrink-0 overflow-hidden rounded-xl border border-bruma bg-espuma shadow-sm transition-transform duration-300 group-hover:scale-105 focus-visible:ring-2 focus-visible:ring-mediterraneo"
                     data-dish-preview-trigger
-                    aria-label="Ver {% if is_wine == 'bodega-mediterranea' %}etiqueta de{% else %}imagen de{% endif %} {{ dish.name }}">
+                    aria-label="Ver imagen de {{ dish.name }}">
               <img src="{{ dish.image.url }}"
                    alt="{{ dish.name }}"
                    loading="lazy"

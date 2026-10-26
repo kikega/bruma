@@ -1,55 +1,58 @@
 /**
- * Pestañas interactivas de La Carta (patrón WAI-ARIA Tabs con soporte de teclado).
+ * Pestañas interactivas de La Carta y La Bodega (patrón WAI-ARIA Tabs con soporte de teclado).
  */
 export function initMenuTabs() {
-  const container = document.querySelector('[data-menu-tabs]');
-  if (!container) return;
+  const containers = [...document.querySelectorAll('[data-menu-tabs]')];
+  if (!containers.length) return;
 
-  const tabs = [...container.querySelectorAll('[role="tab"]')];
-  const panels = [...container.querySelectorAll('[role="tabpanel"]')];
-  if (!tabs.length) return;
+  containers.forEach((container) => {
+    const tabs = [...container.querySelectorAll('[role="tab"]')];
+    const panels = [...container.querySelectorAll('[role="tabpanel"]')];
+    if (!tabs.length) return;
 
-  const activateTab = (nextTab, { focus = false } = {}) => {
-    const targetId = nextTab.getAttribute('aria-controls');
+    const activateTab = (nextTab, { focus = false } = {}) => {
+      const targetId = nextTab.getAttribute('aria-controls');
 
-    for (const tab of tabs) {
-      const selected = tab === nextTab;
-      tab.setAttribute('aria-selected', String(selected));
-      tab.tabIndex = selected ? 0 : -1;
-      if (selected && focus) tab.focus();
-    }
-
-    for (const panel of panels) {
-      const active = panel.id === targetId;
-      panel.hidden = !active;
-      panel.classList.remove('is-entering');
-      if (active) {
-        // Reinicia la animación fade-in al cambiar de categoría
-        void panel.offsetWidth;
-        panel.classList.add('is-entering');
+      for (const tab of tabs) {
+        const selected = tab === nextTab;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        if (selected && focus) tab.focus();
       }
-    }
-  };
 
-  tabs.forEach((tab, index) => {
-    tab.addEventListener('click', () => activateTab(tab));
-
-    tab.addEventListener('keydown', (event) => {
-      let nextIndex = null;
-      if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
-      else if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
-      else if (event.key === 'Home') nextIndex = 0;
-      else if (event.key === 'End') nextIndex = tabs.length - 1;
-
-      if (nextIndex !== null) {
-        event.preventDefault();
-        activateTab(tabs[nextIndex], { focus: true });
+      for (const panel of panels) {
+        const active = panel.id === targetId;
+        panel.hidden = !active;
+        panel.classList.remove('is-entering');
+        if (active) {
+          // Reinicia la animación fade-in al cambiar de categoría
+          void panel.offsetWidth;
+          panel.classList.add('is-entering');
+        }
       }
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => activateTab(tab));
+
+      tab.addEventListener('keydown', (event) => {
+        let nextIndex = null;
+        if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+        else if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+        else if (event.key === 'Home') nextIndex = 0;
+        else if (event.key === 'End') nextIndex = tabs.length - 1;
+
+        if (nextIndex !== null) {
+          event.preventDefault();
+          activateTab(tabs[nextIndex], { focus: true });
+        }
+      });
     });
+
+    initCategoryModals(container);
   });
 
-  initCategoryModals(container);
-  initDishFloatingPreview(container);
+  initDishFloatingPreview();
 }
 
 let supportsDisplayTransition;
@@ -76,14 +79,15 @@ function supportsTopLayerExit() {
  * Vista previa flotante centrada en pantalla (plato o etiqueta de vino) con fade-in / fade-out.
  * Funciona tanto en las tarjetas de la landing como dentro del popup modal (<dialog>) gracias a Top Layer.
  */
-function initDishFloatingPreview(container) {
+function initDishFloatingPreview() {
   const popover = document.getElementById('dish-floating-preview');
-  const cards = [...container.querySelectorAll('[data-dish-preview-card]')];
+  const cards = [...document.querySelectorAll('[data-dish-preview-card]')];
   if (!popover || !cards.length) return;
 
   const imgEl = popover.querySelector('[data-dish-preview-img]');
   const titleEl = popover.querySelector('[data-dish-preview-title]');
   const detailEl = popover.querySelector('[data-dish-preview-detail]');
+  const notesEl = popover.querySelector('[data-dish-preview-notes]');
   const priceEl = popover.querySelector('[data-dish-preview-price]');
   const closeBtn = popover.querySelector('[data-dish-preview-close]');
 
@@ -99,7 +103,7 @@ function initDishFloatingPreview(container) {
   const showPreview = (card, { pin = false } = {}) => {
     popover.removeAttribute('data-closing');
 
-    const { dishImage, dishTitle, dishDetail, dishPrice, dishKind } = card.dataset;
+    const { dishImage, dishTitle, dishDetail, dishNotes, dishPrice, dishKind } = card.dataset;
     if (!dishImage || !imgEl) return;
 
     activeCard = card;
@@ -118,6 +122,10 @@ function initDishFloatingPreview(container) {
     if (detailEl) {
       detailEl.textContent = dishDetail || '';
       detailEl.hidden = !dishDetail;
+    }
+    if (notesEl) {
+      notesEl.textContent = dishNotes || '';
+      notesEl.hidden = !dishNotes;
     }
 
     if (hasPopoverAPI) {

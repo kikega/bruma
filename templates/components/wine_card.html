@@ -1,0 +1,70 @@
+{# Tarjeta de vino individual para La Bodega. Uso: {% include "components/wine_card.html" with wine=wine id_prefix="wine" %} #}
+{% with heading_id=id_prefix|default:"wine" %}
+  <li class="group relative flex flex-col rounded-bruma border border-bruma bg-white/80 p-6 transition-[box-shadow,transform,border-color] duration-500 ease-marea hover:-translate-y-0.5 hover:border-arena/60 hover:shadow-bruma{% if wine.image %} cursor-pointer{% endif %}"{% if wine.image %} data-dish-preview-card data-dish-image="{{ wine.image.url }}" data-dish-title="{{ wine.name }}" data-dish-detail="{{ wine.get_wine_type_display }} · {{ wine.wine_region }} · {{ wine.varietal }}" data-dish-notes="{{ wine.tasting_notes }}" data-dish-price="{{ wine.price|floatformat:'-2' }} €{% if wine.price_unit %} · {{ wine.price_unit }}{% endif %}" data-dish-kind="wine"{% endif %}>
+    <article class="flex h-full flex-col" aria-labelledby="{{ heading_id }}-{{ wine.pk }}">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex items-start gap-3.5">
+          {% if wine.image %}
+            <button type="button"
+                    class="group/thumb relative mt-0.5 flex h-18 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-bruma bg-abisal p-1 shadow-sm transition-transform duration-300 group-hover:scale-105 focus-visible:ring-2 focus-visible:ring-mediterraneo"
+                    data-dish-preview-trigger
+                    aria-label="Ver botella o etiqueta de {{ wine.name }}">
+              <img src="{{ wine.image.url }}"
+                   alt="Etiqueta de {{ wine.name }}"
+                   loading="lazy"
+                   decoding="async"
+                   class="size-full object-contain transition-transform duration-500 group-hover/thumb:scale-110">
+              <span class="pointer-events-none absolute inset-0 flex items-center justify-center bg-abisal/45 text-espuma opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible/thumb:opacity-100" aria-hidden="true">
+                <svg class="size-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.5 10s3-5.5 7.5-5.5S17.5 10 17.5 10s-3 5.5-7.5 5.5S2.5 10 2.5 10z"/>
+                  <circle cx="10" cy="10" r="2.2"/>
+                </svg>
+              </span>
+            </button>
+          {% endif %}
+          <div>
+            <div class="flex flex-wrap items-center gap-1.5 text-[0.7rem] font-semibold tracking-wider uppercase">
+              <span class="rounded-full bg-abisal/8 px-2.5 py-0.5 text-abisal">{{ wine.get_wine_type_display }}</span>
+              {% if wine.wine_region %}
+                <span class="text-salvia-dark">{{ wine.wine_region }}</span>
+              {% endif %}
+            </div>
+            <h4 id="{{ heading_id }}-{{ wine.pk }}" class="mt-1.5 font-serif text-xl leading-tight font-semibold text-abisal sm:text-2xl">
+              {{ wine.name }}
+              {% if wine.is_signature %}
+                <span class="ml-1 inline-block translate-y-[-2px] align-middle text-arena-dorada" title="Selección del sumiller">
+                  <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5l2.35 5.2 5.65.55-4.25 3.8 1.25 5.55L10 13.7l-5 2.9 1.25-5.55L2 7.25l5.65-.55z"/></svg>
+                  <span class="sr-only">Selección del sumiller</span>
+                </span>
+              {% endif %}
+            </h4>
+            {% if wine.varietal %}
+              <p class="mt-1 text-xs font-medium text-mediterraneo">
+                <span class="font-semibold tracking-wide text-tinta/55 uppercase">Varietal:</span> {{ wine.varietal }}
+              </p>
+            {% endif %}
+          </div>
+        </div>
+        <p class="shrink-0 text-right font-serif text-xl font-semibold text-mediterraneo">
+          <data value="{{ wine.price|stringformat:'.2f' }}">{{ wine.price|floatformat:"-2" }}&nbsp;€</data>
+          {% if wine.price_unit %}<span class="block font-sans text-[0.7rem] font-medium text-tinta/50">{{ wine.price_unit }}</span>{% endif %}
+        </p>
+      </div>
+
+      {% if wine.description %}
+        <p class="mt-3 text-sm leading-relaxed text-tinta/75">{{ wine.description }}</p>
+      {% endif %}
+
+      {% if wine.tasting_notes %}
+        <div class="mt-3 rounded-xl border border-arena/40 bg-espuma/80 px-3.5 py-2.5 text-xs leading-relaxed text-tinta/80">
+          <span class="font-semibold tracking-wide text-abisal uppercase">Notas de cata:</span>
+          <span class="italic">{{ wine.tasting_notes }}</span>
+        </div>
+      {% endif %}
+
+      <div class="mt-auto pt-4">
+        {% include "components/allergen_badges.html" with allergens=wine.allergens.all %}
+      </div>
+    </article>
+  </li>
+{% endwith %}

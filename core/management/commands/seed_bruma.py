@@ -17,7 +17,7 @@ from django.utils.text import slugify
 from PIL import Image, ImageDraw
 
 from gallery.models import GalleryImage
-from menu.models import Allergen, Category, Dish
+from menu.models import Allergen, Category, Dish, Wine
 from reservations.models import SeatingArea
 
 ALLERGENS = [
@@ -70,14 +70,118 @@ MENU = [
         ('Naranja, aceite y sal', 'Cremoso de naranja sanguina, crumble de aceite de oliva y escamas de sal.', '', '10.00', '', ['lacteos', 'huevos', 'gluten'], False),
         ('Quesos artesanos del Mediterráneo', 'Selección de tres quesos con membrillo de higo y picos de aceite.', '', '16.00', '', ['lacteos', 'gluten', 'frutos-cascara'], False),
     ]),
-    ('bodega-mediterranea', 'Bodega Mediterránea', 'Blancos salinos, tintos suaves y burbujas', BODEGA_INTRO, [
-        ('Albariño «Pazo Señorans»', 'Blanco salino y floral, con notas de fruta de hueso y final mineral.', 'D.O. Rías Baixas · Botella', '34.00', '', ['sulfitos'], False),
-        ('Malvasía de Sitges «Aiguadolç»', 'Aromático, fresco y marino, perfecto con crudos y ostras.', 'D.O. Penedès · Botella', '29.00', '', ['sulfitos'], False),
-        ('Merseguera «El Sequé»', 'Variedad autóctona, hierbas de monte y brisa mediterránea.', 'D.O. Alicante · Copa / Botella', '7.50', '', ['sulfitos'], False),
-        ('Garnacha «Les Terrasses»', 'Tinto suave de pizarra, fruta roja y fina mineralidad.', 'D.O.Q. Priorat · Botella', '48.00', '', ['sulfitos'], False),
-        ('Cava Gran Reserva Brut Nature', 'Burbuja fina, notas de pastelería y corteza de pan.', 'D.O. Cava · Botella', '42.00', '', ['sulfitos'], True),
-        ('Champagne Blanc de Blancs', 'Tiza, cítricos y elegancia; el cierre perfecto.', 'A.O.C. Champagne · Botella', '95.00', '', ['sulfitos'], False),
-    ]),
+]
+
+# (nombre, tipo_vino, zona_vinicola, varietal, descripción, notas_de_cata, precio, unidad_precio, alérgenos, selección_sumiller)
+WINES = [
+    (
+        'Albariño «Pazo Señorans»',
+        Wine.WineType.WHITE,
+        'D.O. Rías Baixas',
+        '100 % Albariño',
+        'Blanco atlántico criado sobre lías en acero inoxidable, procedente de viñedos históricos del Valle del Salnés.',
+        'Intenso y floral en nariz con fruta de hueso blanca y cítricos; boca salina, vibrante y de final mineral persistente.',
+        '34.00',
+        'Botella',
+        ['sulfitos'],
+        True,
+    ),
+    (
+        'Malvasía de Sitges «Aiguadolç»',
+        Wine.WineType.WHITE,
+        'D.O. Penedès',
+        '100 % Malvasía de Sitges',
+        'Blanco mediterráneo de viñas costeras acariciadas por la brisa marina del macizo del Garraf.',
+        'Aromático y envolvente, con notas de flor de azahar, melocotón blanco y un recuerdo yodado ideal para crudos y ostras.',
+        '29.00',
+        'Botella',
+        ['sulfitos'],
+        False,
+    ),
+    (
+        'Merseguera «El Sequé»',
+        Wine.WineType.WHITE,
+        'D.O. Alicante',
+        '100 % Merseguera',
+        'Variedad autóctona levantina cultivada en secano sobre suelos calcáreos y arenosos.',
+        'Hierbas de monte bajo, hinojo fresco, almendra tierna y cítricos maduros; paso seco, equilibrado y refrescante.',
+        '7.50',
+        'Copa / Botella',
+        ['sulfitos'],
+        False,
+    ),
+    (
+        'Godello «Louro do Bolo»',
+        Wine.WineType.WHITE,
+        'D.O. Valdeorras',
+        'Godello y Treixadura',
+        'Fermentado con sus lías en fudres de roble francés de laderas graníticas de alta montaña.',
+        'Fruta blanca madura, hinojo silvestre y sutiles notas tostadas; entrada amplia, cremosa y gran tensión ácida.',
+        '36.00',
+        'Botella',
+        ['sulfitos'],
+        False,
+    ),
+    (
+        'Garnacha «Les Terrasses»',
+        Wine.WineType.RED,
+        'D.O.Q. Priorat',
+        'Garnacha Negra y Cariñena',
+        'Tinto de laderas escarpadas de pizarra licorella trabajadas de forma tradicional.',
+        'Fruta roja silvestre, violetas y grafito mineral; tanino sedoso, buena acidez y un fondo balsámico largo.',
+        '48.00',
+        'Botella',
+        ['sulfitos'],
+        True,
+    ),
+    (
+        'Giró «Parotet»',
+        Wine.WineType.RED,
+        'D.O. Alicante',
+        'Giró y Mandó',
+        'Tinto mediterráneo criado en ánfora de barro, fresco y ligero, ideal para pescados a la brasa y arroces.',
+        'Granada, cereza crujiente, monte mediterráneo y pimienta rosa; paso fluido, jugoso y muy gastronómico.',
+        '35.00',
+        'Botella',
+        ['sulfitos'],
+        False,
+    ),
+    (
+        'Cava Gran Reserva Brut Nature',
+        Wine.WineType.SPARKLING,
+        'D.O. Cava',
+        'Xarel·lo, Macabeo y Parellada',
+        'Espumoso de larga crianza en rima superior a 48 meses sin adición de licor de expedición.',
+        'Burbuja finísima e integrada, notas de manzana asada, brioche, frutos secos tostados y final seco y salino.',
+        '42.00',
+        'Botella',
+        ['sulfitos'],
+        True,
+    ),
+    (
+        'Champagne Blanc de Blancs',
+        Wine.WineType.SPARKLING,
+        'A.O.C. Champagne',
+        '100 % Chardonnay',
+        'Cuvée parcelaria de suelos calcáreos de la Côte des Blancs con crianza prolongada sobre lías.',
+        'Tiza húmeda, corteza de limón confitado, flores blancas y avellana; vertical, vibrante y de elegancia cristalina.',
+        '95.00',
+        'Botella',
+        ['sulfitos'],
+        False,
+    ),
+    (
+        'Rosado de Lágrima «Casta Diva»',
+        Wine.WineType.ROSE,
+        'D.O. Alicante',
+        'Monastrell y Garnacha',
+        'Rosado pálido obtenido por sangrado directo de viñedos próximos a la costa alicantina.',
+        'Pétalos de rosa, pomelo rosado y fresa blanca; boca fresca, sedosa y con sutil salinidad final.',
+        '27.00',
+        'Botella',
+        ['sulfitos'],
+        False,
+    ),
 ]
 
 AREAS = [
@@ -133,6 +237,7 @@ class Command(BaseCommand):
     def handle(self, *args, reset_menu=False, **options):
         allergens = self._seed_allergens()
         self._seed_menu(allergens, reset=reset_menu)
+        self._seed_wines(allergens, reset=reset_menu)
         self._seed_areas()
         self._seed_gallery()
         self.stdout.write(self.style.SUCCESS('Datos de Bruma cargados correctamente.'))
@@ -250,6 +355,10 @@ class Command(BaseCommand):
     def _seed_menu(self, allergens, *, reset):
         if reset:
             Dish.objects.all().delete()
+        # Si quedaba alguna categoría antigua de bodega en Dish/Category, se limpia
+        Dish.objects.filter(category__slug='bodega-mediterranea').delete()
+        Category.objects.filter(slug='bodega-mediterranea').delete()
+
         created = 0
         for c_order, (slug, name, tagline, intro, dishes) in enumerate(MENU):
             category, _ = Category.objects.update_or_create(
@@ -269,12 +378,39 @@ class Command(BaseCommand):
                 created += was_created
         self.stdout.write(f'  · carta: {len(MENU)} categorías, {created} platos nuevos')
 
-    def _attach_dish_seed_image(self, dish, *, category_slug, index):
-        if category_slug == 'bodega-mediterranea':
-            svg = self._build_wine_label_svg(dish)
-            dish.image.save(f'etiqueta-{slugify(dish.name)}.svg', ContentFile(svg.encode('utf-8')), save=True)
-            return
+    def _seed_wines(self, allergens, *, reset):
+        if reset:
+            Wine.objects.all().delete()
+        created = 0
+        for w_order, (
+            w_name, w_type, w_region, varietal, desc, tasting_notes, price, unit, codes, signature
+        ) in enumerate(WINES):
+            wine, was_created = Wine.objects.update_or_create(
+                name=w_name,
+                defaults={
+                    'wine_type': w_type,
+                    'wine_region': w_region,
+                    'varietal': varietal,
+                    'description': desc,
+                    'tasting_notes': tasting_notes,
+                    'price': Decimal(price),
+                    'price_unit': unit,
+                    'is_signature': signature,
+                    'order': w_order,
+                },
+            )
+            wine.allergens.set([allergens[c] for c in codes])
+            if not wine.image:
+                svg = self._build_wine_label_svg(wine)
+                wine.image.save(
+                    f'etiqueta-{slugify(wine.name)}.svg',
+                    ContentFile(svg.encode('utf-8')),
+                    save=True,
+                )
+            created += was_created
+        self.stdout.write(f'  · bodega: {len(WINES)} referencias ({created} vinos nuevos)')
 
+    def _attach_dish_seed_image(self, dish, *, category_slug, index):
         candidates = CATEGORY_SEED_IMAGES.get(category_slug, [])
         if not candidates:
             return
@@ -285,10 +421,13 @@ class Command(BaseCommand):
             dish.image.save(f'plato-{slugify(dish.name)}.webp', File(fh), save=True)
 
     @staticmethod
-    def _build_wine_label_svg(dish):
-        title = escape(dish.name)
-        detail = escape(dish.detail or 'Selección Bruma · Bodega Mediterránea')
-        desc = escape(dish.description[:76] + ('…' if len(dish.description) > 76 else ''))
+    def _build_wine_label_svg(wine):
+        title = escape(wine.name)
+        region = escape(wine.wine_region or 'Selección Bruma')
+        varietal = escape(wine.varietal or '')
+        type_label = escape(wine.get_wine_type_display().upper())
+        notes_src = wine.tasting_notes or wine.description or ''
+        notes = escape(notes_src[:72] + ('…' if len(notes_src) > 72 else ''))
         return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 800" width="640" height="800">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
@@ -304,16 +443,17 @@ class Command(BaseCommand):
   <circle cx="320" cy="140" r="220" fill="#C2B280" fill-opacity="0.08"/>
   <rect x="76" y="76" width="488" height="648" rx="18" fill="url(#paper)" stroke="#C2B280" stroke-width="3"/>
   <rect x="96" y="96" width="448" height="608" rx="10" fill="none" stroke="#0F1E2E" stroke-opacity="0.22" stroke-width="1.5"/>
-  <text x="320" y="165" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="600" letter-spacing="5" fill="#5E716A">BRUMA · BODEGA MEDITERRÁNEA</text>
-  <line x1="230" y1="192" x2="410" y2="192" stroke="#C2B280" stroke-width="1.5"/>
-  <path d="M295 250 C310 235, 330 235, 345 250 C360 265, 380 265, 395 250" fill="none" stroke="#1E4E68" stroke-width="2" stroke-linecap="round"/>
-  <path d="M275 268 C295 253, 315 253, 335 268 C355 283, 375 283, 395 268" fill="none" stroke="#C2B280" stroke-width="1.5" stroke-linecap="round"/>
-  <text x="320" y="365" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="34" font-weight="600" fill="#0F1E2E">{title}</text>
-  <text x="320" y="420" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="600" letter-spacing="3" fill="#1E4E68">{detail.upper()}</text>
-  <line x1="260" y1="455" x2="380" y2="455" stroke="#C2B280" stroke-width="1"/>
-  <text x="320" y="510" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-style="italic" font-size="21" fill="#2B343B">{desc}</text>
+  <text x="320" y="155" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="600" letter-spacing="5" fill="#5E716A">BRUMA · {type_label}</text>
+  <line x1="230" y1="180" x2="410" y2="180" stroke="#C2B280" stroke-width="1.5"/>
+  <path d="M295 235 C310 220, 330 220, 345 235 C360 250, 380 250, 395 235" fill="none" stroke="#1E4E68" stroke-width="2" stroke-linecap="round"/>
+  <path d="M275 253 C295 238, 315 238, 335 253 C355 268, 375 268, 395 253" fill="none" stroke="#C2B280" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="320" y="340" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="33" font-weight="600" fill="#0F1E2E">{title}</text>
+  <text x="320" y="390" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="600" letter-spacing="3" fill="#1E4E68">{region.upper()}</text>
+  <text x="320" y="422" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="500" letter-spacing="1.5" fill="#5E716A">{varietal}</text>
+  <line x1="260" y1="452" x2="380" y2="452" stroke="#C2B280" stroke-width="1"/>
+  <text x="320" y="505" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-style="italic" font-size="20" fill="#2B343B">{notes}</text>
   <rect x="245" y="585" width="150" height="44" rx="22" fill="#0F1E2E"/>
-  <text x="320" y="613" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="22" font-weight="600" fill="#FAF7F0">{dish.price:.2f} €</text>
+  <text x="320" y="613" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="22" font-weight="600" fill="#FAF7F0">{wine.price:.2f} €</text>
   <text x="320" y="675" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="10" letter-spacing="4" fill="#5E716A">COSECHA SELECCIONADA · SERVICIO EN SALA</text>
 </svg>"""
 

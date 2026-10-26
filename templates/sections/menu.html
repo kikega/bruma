@@ -144,7 +144,11 @@
         </ul>
         <p class="mt-5 text-xs text-tinta/55">Si tienes alguna alergia o intolerancia, indícalo en tu reserva o consulta a nuestro equipo de sala.</p>
       </details>
+    {% else %}
+      <p class="mt-14 text-tinta/60">Nuestra carta se está actualizando. Vuelve muy pronto.</p>
+    {% endif %}
 
+    {% if categories or wine_groups %}
       {# Vista previa flotante centrada en pantalla (plato o etiqueta de vino) con fade-in / fade-out #}
       <div id="dish-floating-preview"
            popover="manual"
@@ -172,11 +176,10 @@
               <span class="shrink-0 font-serif text-lg font-semibold text-arena" data-dish-preview-price></span>
             </div>
             <p class="mt-0.5 text-xs font-semibold tracking-wide text-arena/80 uppercase" data-dish-preview-detail hidden></p>
+            <p class="mt-2 border-t border-white/10 pt-2 text-xs leading-relaxed text-espuma/80 italic" data-dish-preview-notes hidden></p>
           </figcaption>
         </figure>
       </div>
-    {% else %}
-      <p class="mt-14 text-tinta/60">Nuestra carta se está actualizando. Vuelve muy pronto.</p>
     {% endif %}
   </div>
 </section>

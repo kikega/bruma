@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Allergen, Category, Dish
+from .models import Allergen, Category, Dish, Wine
 
 
 @admin.register(Allergen)
@@ -67,3 +67,49 @@ class DishAdmin(admin.ModelAdmin):
         return format_html(
             '<img src="{}" alt="" style="max-height:240px;border-radius:8px">', obj.image.url,
         )
+
+
+@admin.register(Wine)
+class WineAdmin(admin.ModelAdmin):
+    list_display = (
+        'thumbnail', 'name', 'wine_type', 'wine_region', 'varietal',
+        'price', 'price_unit', 'is_signature', 'is_active', 'order',
+    )
+    list_display_links = ('thumbnail', 'name')
+    list_editable = ('price', 'is_active', 'order')
+    list_filter = ('wine_type', 'wine_region', 'is_active', 'is_signature', 'allergens')
+    search_fields = ('name', 'wine_region', 'varietal', 'description', 'tasting_notes')
+    filter_horizontal = ('allergens',)
+    readonly_fields = ('preview',)
+    fieldsets = (
+        ('Identificación y origen', {
+            'fields': ('name', 'wine_type', 'wine_region', 'varietal'),
+        }),
+        ('Ficha sensorial y cata', {
+            'fields': ('description', 'tasting_notes'),
+        }),
+        ('Servicio y disponibilidad', {
+            'fields': ('price', 'price_unit', 'is_signature', 'is_active', 'order'),
+        }),
+        ('Botella / etiqueta y alérgenos', {
+            'fields': ('image', 'preview', 'allergens'),
+        }),
+    )
+
+    @admin.display(description='botella / etiqueta')
+    def thumbnail(self, obj):
+        if not obj.image:
+            return '—'
+        return format_html(
+            '<img src="{}" alt="" style="height:48px;width:38px;object-fit:contain;border-radius:6px;background:#0F1E2E;padding:2px">',
+            obj.image.url,
+        )
+
+    @admin.display(description='vista previa')
+    def preview(self, obj):
+        if not obj.pk or not obj.image:
+            return 'Se mostrará tras guardar.'
+        return format_html(
+            '<img src="{}" alt="" style="max-height:280px;border-radius:8px">', obj.image.url,
+        )
+
