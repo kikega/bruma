@@ -15,9 +15,11 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        wine_groups = Wine.objects.grouped_by_type()
         context.update(
             categories=Category.objects.with_active_dishes(),
-            wine_groups=Wine.objects.grouped_by_type(),
+            wine_groups=wine_groups,
+            total_wines_count=sum(len(group['wines']) for group in wine_groups),
             allergens=Allergen.objects.all(),
             gallery_images=GalleryImage.objects.published(),
             reservation_form=ReservationForm(),

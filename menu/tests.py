@@ -119,9 +119,13 @@ class CategoryMenuPopupTests(TestCase):
         self.assertContains(response, 'Notas salinas y cítricas 1')
         self.assertContains(response, 'id="dish-floating-preview"')
         self.assertContains(response, 'data-dish-kind="wine"')
+        self.assertContains(response, 'data-dish-description=')
+        self.assertContains(response, 'data-dish-preview-description')
         self.assertContains(response, 'Ver botella o etiqueta de Vino blanco 1')
         self.assertContains(response, 'id="wine-modal-blanco"')
-        self.assertNotContains(response, 'id="wine-modal-tinto"')
+        self.assertContains(response, 'id="wine-modal-tinto"')
+        self.assertNotContains(response, 'id="wine-modal-all"')
+        self.assertContains(response, 'Ver todos los vinos de la bodega')
 
     def test_allergen_png_image_renders_in_dish_and_legend(self):
         allergen = Allergen.objects.create(code='pescado', name='Pescado', abbreviation='PE', order=1)

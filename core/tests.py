@@ -1,7 +1,7 @@
 import json
 import re
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 
@@ -48,3 +48,13 @@ class SeoAndJsonLdTests(TestCase):
         sitemap = self.client.get(reverse('core:sitemap_xml'))
         self.assertEqual(sitemap.status_code, 200)
         self.assertIn('<loc>https://brumarestaurant.es/</loc>', sitemap.content.decode('utf-8'))
+
+    def test_hero_title_uses_logo_by_default_and_can_revert_to_text(self):
+        response = self.client.get(reverse('core:home'))
+        self.assertContains(response, 'class="hero-title-logo"')
+        self.assertContains(response, 'img/brumalogo.webp')
+
+        with override_settings(BRUMA_HERO_USE_LOGO=False):
+            response_text = self.client.get(reverse('core:home'))
+            self.assertNotContains(response_text, 'class="hero-title-logo"')
+            self.assertContains(response_text, 'Donde el mar <em class="font-normal text-mediterraneo">se vuelve</em> bruma')

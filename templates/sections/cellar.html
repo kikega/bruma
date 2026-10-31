@@ -1,18 +1,36 @@
+{% load static %}
 {# La Bodega · sección independiente con pestañas reactivas por tipo de vino #}
 <section id="bodega" class="relative overflow-clip border-t border-bruma bg-bruma-100/55 py-24 sm:py-32" aria-labelledby="bodega-title">
   <div class="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-espuma to-transparent" aria-hidden="true"></div>
 
   <div class="relative mx-auto max-w-6xl px-6">
-    <header class="grid gap-8 lg:grid-cols-12 lg:items-end">
-      <div class="lg:col-span-5">
+    <header>
+      <div>
         <p class="eyebrow" data-reveal>La Bodega</p>
         <h2 id="bodega-title" class="section-title mt-5" data-reveal>
           Armonías <em class="font-normal text-mediterraneo">líquidas</em>
         </h2>
       </div>
-      <p class="text-base leading-relaxed text-tinta/75 lg:col-span-7 lg:text-lg" data-reveal>
-        En Bruma, nuestra bodega es un homenaje al arte del vino, seleccionada con esmero para complementar y realzar cada plato de nuestra cocina de lonja. Contamos con una cuidada colección de etiquetas mediterráneas, atlánticas e internacionales —con su zona vinícola, varietal y notas de cata— pensada para acompañar desde los crudos más salinos hasta los arroces y pescados a la brasa.
-      </p>
+
+      <div class="mt-8 grid items-center gap-8 md:grid-cols-12 lg:gap-10">
+        <p class="text-base leading-relaxed text-tinta/75 md:col-span-7 lg:col-span-8 lg:text-lg" data-reveal style="--reveal-delay: 80ms">
+          En Bruma, nuestra bodega es un homenaje al arte del vino, seleccionada con esmero para complementar y realzar cada plato de nuestra cocina de lonja. Contamos con una cuidada colección de etiquetas mediterráneas, atlánticas e internacionales —con su zona vinícola, varietal y notas de cata— pensada para acompañar desde los crudos más salinos hasta los arroces y pescados a la brasa.
+        </p>
+
+        <figure class="relative max-w-sm md:col-span-5 md:max-w-none lg:col-span-4" data-reveal style="--reveal-delay: 140ms">
+          <div class="overflow-hidden rounded-bruma border border-arena/45 bg-white/75 p-1.5 shadow-bruma">
+            <div class="aspect-[16/10] overflow-hidden rounded-2xl bg-bruma">
+              <img src="{% static 'img/tapon-bruma.webp' %}"
+                   alt="Tapón de corcho artesanal grabado con el sello de Bruma sobre madera"
+                   width="1000"
+                   height="1000"
+                   loading="lazy"
+                   decoding="async"
+                   class="h-full w-full object-cover object-center transition-transform duration-700 ease-marea hover:scale-105">
+            </div>
+          </div>
+        </figure>
+      </div>
     </header>
 
     {% if wine_groups %}
@@ -41,7 +59,7 @@
                 {% endif %}
               </div>
               <p class="text-xs font-semibold tracking-wider text-tinta/50 uppercase">
-                Pulsa en cada referencia para ver su botella o etiqueta
+                Pulsa en cada referencia para ver su etiqueta, descripción y notas de cata
               </p>
             </div>
 
@@ -51,72 +69,70 @@
               {% endfor %}
             </ul>
 
-            {% if group.has_more_wines %}
-              <div class="mt-8 flex justify-center sm:justify-start">
-                <button type="button"
-                        class="btn btn-ghost group"
-                        commandfor="wine-modal-{{ group.slug }}"
-                        command="show-modal"
-                        data-menu-modal-open="wine-modal-{{ group.slug }}">
-                  <span>Ver selección completa de {{ group.name }}</span>
-                  <span class="rounded-full bg-abisal/10 px-2.5 py-0.5 text-xs font-semibold text-abisal transition-colors group-hover:bg-abisal group-hover:text-espuma">
-                    +{{ group.extra_wines_count }}
-                  </span>
-                  <svg class="size-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 10h12m-4-4l4 4-4 4"/>
-                  </svg>
-                </button>
-              </div>
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
+              <button type="button"
+                      class="btn btn-ghost group"
+                      commandfor="wine-modal-{{ group.slug }}"
+                      command="show-modal"
+                      data-menu-modal-open="wine-modal-{{ group.slug }}">
+                <span>Ver todos los vinos de la bodega</span>
+                <span class="rounded-full bg-abisal/10 px-2.5 py-0.5 text-xs font-semibold text-abisal transition-colors group-hover:bg-abisal group-hover:text-espuma">
+                  {% if group.has_more_wines %}+{{ group.extra_wines_count }}{% else %}{{ group.wines|length }}{% endif %}
+                </span>
+                <svg class="size-4 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 10h12m-4-4l4 4-4 4"/>
+                </svg>
+              </button>
+            </div>
 
-              {# Popup modal con todas las referencias de ese tipo de vino #}
-              <dialog id="wine-modal-{{ group.slug }}"
-                      class="menu-modal"
-                      closedby="any"
-                      aria-labelledby="wine-modal-title-{{ group.slug }}">
-                <div class="mx-auto flex max-h-[88dvh] w-full max-w-5xl flex-col overflow-hidden rounded-bruma border border-bruma bg-espuma text-tinta shadow-2xl" data-menu-modal-shell>
-                  <header class="flex items-start justify-between gap-4 border-b border-bruma bg-white/80 px-6 py-5 backdrop-blur-md sm:px-8">
-                    <div>
-                      <p class="eyebrow">La Bodega · {{ group.wines|length }} referencias</p>
-                      <h3 id="wine-modal-title-{{ group.slug }}" class="mt-2 font-serif text-3xl font-medium text-abisal sm:text-4xl">
-                        {{ group.name }}
-                      </h3>
-                      {% if group.tagline %}
-                        <p class="mt-1 text-sm font-medium tracking-wide text-salvia-dark">{{ group.tagline }}</p>
-                      {% endif %}
-                    </div>
-                    <button type="button"
-                            class="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-abisal/15 bg-white text-abisal transition-colors hover:border-abisal hover:bg-abisal hover:text-espuma"
-                            commandfor="wine-modal-{{ group.slug }}"
-                            command="close"
-                            data-menu-modal-close
-                            aria-label="Cerrar selección de {{ group.name }} (Esc)">
-                      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                        <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/>
-                      </svg>
-                    </button>
-                  </header>
-
-                  <div class="overflow-y-auto px-6 py-6 sm:px-8 sm:py-8">
-                    <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" role="list">
-                      {% for wine in group.wines %}
-                        {% include "components/wine_card.html" with wine=wine id_prefix="modal-wine" %}
-                      {% endfor %}
-                    </ul>
+            {# Popup modal con todas las referencias del tipo de vino seleccionado #}
+            <dialog id="wine-modal-{{ group.slug }}"
+                    class="menu-modal"
+                    closedby="any"
+                    aria-labelledby="wine-modal-title-{{ group.slug }}">
+              <div class="mx-auto flex max-h-[88dvh] w-full max-w-5xl flex-col overflow-hidden rounded-bruma border border-bruma bg-espuma text-tinta shadow-2xl" data-menu-modal-shell>
+                <header class="flex items-start justify-between gap-4 border-b border-bruma bg-white/80 px-6 py-5 backdrop-blur-md sm:px-8">
+                  <div>
+                    <p class="eyebrow">La Bodega · {{ group.wines|length }} {% if group.wines|length == 1 %}referencia{% else %}referencias{% endif %}</p>
+                    <h3 id="wine-modal-title-{{ group.slug }}" class="mt-2 font-serif text-3xl font-medium text-abisal sm:text-4xl">
+                      {{ group.name }}
+                    </h3>
+                    {% if group.tagline %}
+                      <p class="mt-1 text-sm font-medium tracking-wide text-salvia-dark">{{ group.tagline }}</p>
+                    {% endif %}
                   </div>
+                  <button type="button"
+                          class="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-abisal/15 bg-white text-abisal transition-colors hover:border-abisal hover:bg-abisal hover:text-espuma"
+                          commandfor="wine-modal-{{ group.slug }}"
+                          command="close"
+                          data-menu-modal-close
+                          aria-label="Cerrar selección de {{ group.name }} (Esc)">
+                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                      <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/>
+                    </svg>
+                  </button>
+                </header>
 
-                  <footer class="flex flex-wrap items-center justify-between gap-4 border-t border-bruma bg-white/70 px-6 py-4 text-xs text-tinta/60 sm:px-8">
-                    <span>Pulsa <kbd class="rounded border border-abisal/20 bg-white px-1.5 py-0.5 font-sans text-[0.7rem] font-semibold text-abisal">Esc</kbd> o fuera de la ventana para volver</span>
-                    <button type="button"
-                            class="btn btn-ghost min-h-9 px-4 py-1.5 text-xs"
-                            commandfor="wine-modal-{{ group.slug }}"
-                            command="close"
-                            data-menu-modal-close>
-                      Cerrar
-                    </button>
-                  </footer>
+                <div class="overflow-y-auto px-6 py-6 sm:px-8 sm:py-8">
+                  <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" role="list">
+                    {% for wine in group.wines %}
+                      {% include "components/wine_card.html" with wine=wine id_prefix="modal-wine" %}
+                    {% endfor %}
+                  </ul>
                 </div>
-              </dialog>
-            {% endif %}
+
+                <footer class="flex flex-wrap items-center justify-between gap-4 border-t border-bruma bg-white/70 px-6 py-4 text-xs text-tinta/60 sm:px-8">
+                  <span>Pulsa <kbd class="rounded border border-abisal/20 bg-white px-1.5 py-0.5 font-sans text-[0.7rem] font-semibold text-abisal">Esc</kbd> o fuera de la ventana para volver</span>
+                  <button type="button"
+                          class="btn btn-ghost min-h-9 px-4 py-1.5 text-xs"
+                          commandfor="wine-modal-{{ group.slug }}"
+                          command="close"
+                          data-menu-modal-close>
+                    Cerrar
+                  </button>
+                </footer>
+              </div>
+            </dialog>
           </div>
         {% endfor %}
       </div>

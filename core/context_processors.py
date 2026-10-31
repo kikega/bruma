@@ -118,4 +118,5 @@ def restaurant(request):
         'accepts_reservations': ACCEPTS_RESERVATIONS,
         'aceptar_reservas': ACCEPTS_RESERVATIONS,
         'logo_path': LOGO_PATH if _logo_available() else None,
+        'hero_use_logo': getattr(settings, 'BRUMA_HERO_USE_LOGO', True) and _logo_available(),
     }

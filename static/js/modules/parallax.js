@@ -40,7 +40,7 @@ export function initRevealAndParallax() {
   const activeScopes = new Set();
   let ticking = false;
 
-  const parsePercent = (raw, fallback = 0) => {
+  const parseNumber = (raw, fallback) => {
     if (!raw) return fallback;
     const num = parseFloat(raw);
     return Number.isFinite(num) ? num : fallback;
@@ -52,14 +52,25 @@ export function initRevealAndParallax() {
     for (const scope of activeScopes) {
       const rect = scope.getBoundingClientRect();
       const total = rect.height + vh;
-      const progress = Math.min(Math.max((vh - rect.top) / total, 0), 1);
+      const coverProgress = Math.min(Math.max((vh - rect.top) / total, 0), 1);
+      const exitProgress = Math.min(Math.max(-rect.top / (rect.height || 1), 0), 1);
       const layers = scope.querySelectorAll('[data-parallax]');
       for (const layer of layers) {
+        const isExit = layer.dataset.parallaxRange === 'exit';
+        const progress = isExit ? exitProgress : coverProgress;
         const style = getComputedStyle(layer);
-        const from = parsePercent(style.getPropertyValue('--parallax-from'), 0);
-        const to = parsePercent(style.getPropertyValue('--parallax-to'), 0);
+        const from = parseNumber(style.getPropertyValue('--parallax-from'), 0);
+        const to = parseNumber(style.getPropertyValue('--parallax-to'), 0);
         const current = from + (to - from) * progress;
         layer.style.transform = `translate3d(0, ${current}%, 0)`;
+
+        const fadeFromRaw = style.getPropertyValue('--parallax-fade-from').trim();
+        const fadeToRaw = style.getPropertyValue('--parallax-fade-to').trim();
+        if (fadeFromRaw || fadeToRaw) {
+          const fadeFrom = parseNumber(fadeFromRaw, 1);
+          const fadeTo = parseNumber(fadeToRaw, 1);
+          layer.style.opacity = String(fadeFrom + (fadeTo - fadeFrom) * progress);
+        }
       }
     }
   };

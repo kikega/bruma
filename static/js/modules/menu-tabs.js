@@ -84,9 +84,14 @@ function initDishFloatingPreview() {
   const cards = [...document.querySelectorAll('[data-dish-preview-card]')];
   if (!popover || !cards.length) return;
 
+  const mediaEl = popover.querySelector('[data-dish-preview-media]');
   const imgEl = popover.querySelector('[data-dish-preview-img]');
   const titleEl = popover.querySelector('[data-dish-preview-title]');
   const detailEl = popover.querySelector('[data-dish-preview-detail]');
+  const varietalBoxEl = popover.querySelector('[data-dish-preview-varietal-box]');
+  const varietalEl = popover.querySelector('[data-dish-preview-varietal]');
+  const descriptionEl = popover.querySelector('[data-dish-preview-description]');
+  const notesBoxEl = popover.querySelector('[data-dish-preview-notes-box]');
   const notesEl = popover.querySelector('[data-dish-preview-notes]');
   const priceEl = popover.querySelector('[data-dish-preview-price]');
   const closeBtn = popover.querySelector('[data-dish-preview-close]');
@@ -103,8 +108,17 @@ function initDishFloatingPreview() {
   const showPreview = (card, { pin = false } = {}) => {
     popover.removeAttribute('data-closing');
 
-    const { dishImage, dishTitle, dishDetail, dishNotes, dishPrice, dishKind } = card.dataset;
-    if (!dishImage || !imgEl) return;
+    const {
+      dishImage,
+      dishTitle,
+      dishDetail,
+      dishVarietal,
+      dishDescription,
+      dishNotes,
+      dishPrice,
+      dishKind,
+    } = card.dataset;
+    if (!dishImage && !dishVarietal && !dishDescription && !dishNotes) return;
 
     activeCard = card;
     if (pin) {
@@ -115,17 +129,42 @@ function initDishFloatingPreview() {
     }
 
     popover.dataset.dishKind = dishKind || 'dish';
-    imgEl.src = dishImage;
-    imgEl.alt = dishTitle || '';
+    if (imgEl) {
+      if (dishImage) {
+        imgEl.src = dishImage;
+        imgEl.alt = dishTitle || '';
+        if (mediaEl) mediaEl.hidden = false;
+      } else {
+        imgEl.removeAttribute('src');
+        imgEl.alt = '';
+        if (mediaEl) mediaEl.hidden = true;
+      }
+    }
     if (titleEl) titleEl.textContent = dishTitle || '';
     if (priceEl) priceEl.textContent = dishPrice || '';
     if (detailEl) {
       detailEl.textContent = dishDetail || '';
       detailEl.hidden = !dishDetail;
     }
+    if (varietalEl) {
+      varietalEl.textContent = dishVarietal || '';
+      if (varietalBoxEl) {
+        varietalBoxEl.hidden = !dishVarietal;
+      } else {
+        varietalEl.hidden = !dishVarietal;
+      }
+    }
+    if (descriptionEl) {
+      descriptionEl.textContent = dishDescription || '';
+      descriptionEl.hidden = !dishDescription;
+    }
     if (notesEl) {
       notesEl.textContent = dishNotes || '';
-      notesEl.hidden = !dishNotes;
+      if (notesBoxEl) {
+        notesBoxEl.hidden = !dishNotes;
+      } else {
+        notesEl.hidden = !dishNotes;
+      }
     }
 
     if (hasPopoverAPI) {

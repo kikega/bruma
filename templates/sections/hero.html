@@ -9,21 +9,37 @@
          class="h-full w-full object-cover object-[60%_center]">
   </div>
 
-  {# Capa 2 · Bruma animada (velocidad intermedia) #}
-  <div class="pointer-events-none absolute inset-0" data-parallax data-parallax-range="exit" style="--parallax-to: 12%" aria-hidden="true">
+  {# Capa 2 · Bruma progresiva con scroll (comienza despejada arriba y asciende al bajar) #}
+  <div class="hero-mist-scroll pointer-events-none absolute inset-0"
+       data-parallax data-parallax-range="exit"
+       style="--parallax-from: 55%; --parallax-to: -8%; --parallax-fade-from: 0.25; --parallax-fade-to: 1"
+       aria-hidden="true">
     <div class="mist-layer mist-layer--far animate-bruma-fast"></div>
     <div class="mist-layer animate-bruma-slow"></div>
+    <div class="mist-layer mist-layer--dense animate-bruma-slow"></div>
   </div>
 
-  {# Velo para garantizar contraste del texto #}
-  <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-espuma/70 via-espuma/20 to-abisal/50" aria-hidden="true"></div>
+  {# Velo sutil sólo en la mitad inferior para mantener la parte superior nítida y sin bruma #}
+  <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent via-45% to-abisal/45" aria-hidden="true"></div>
 
   {# Capa 3 · Texto (la más rápida, se desvanece) #}
   <div class="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-6 pb-16 text-center"
        data-parallax data-parallax-range="exit" style="--parallax-to: -35%; --parallax-fade-to: 0">
     <p class="eyebrow animate-fade-in-up text-mediterraneo">Alta cocina mediterránea</p>
     <h1 id="hero-title" class="mt-6 max-w-4xl animate-fade-in-up font-serif text-5xl leading-[0.95] font-medium text-abisal [animation-delay:120ms] sm:text-7xl lg:text-8xl">
-      Donde el mar <em class="font-normal text-mediterraneo">se vuelve</em> bruma
+      {% if hero_use_logo %}
+        {# Opción activa con logo · Para volver al texto original, pon BRUMA_HERO_USE_LOGO=False en .env o deja solo la línea del {% else %} #}
+        Donde el mar <em class="font-normal text-mediterraneo">se vuelve</em>
+        <img src="{% static 'img/brumalogo.webp' %}"
+             alt="Bruma"
+             width="300"
+             height="103"
+             fetchpriority="high"
+             decoding="async"
+             class="hero-title-logo">
+      {% else %}
+        Donde el mar <em class="font-normal text-mediterraneo">se vuelve</em> bruma
+      {% endif %}
     </h1>
     <p class="mt-6 max-w-xl animate-fade-in-up text-base leading-relaxed text-abisal/75 [animation-delay:240ms] sm:text-lg">
       Producto de lonja, sal y luz difusa de la costa. Una travesía sensorial por el Mediterráneo al amanecer.

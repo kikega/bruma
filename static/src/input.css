@@ -89,6 +89,18 @@
     @apply font-serif text-4xl leading-[1.05] font-medium text-abisal sm:text-5xl lg:text-6xl;
   }
 
+  /* Logotipo integrado ópticamente dentro del titular principal del Hero */
+  .hero-title-logo {
+    display: inline-block;
+    height: 0.78em;
+    width: auto;
+    vertical-align: baseline;
+    transform: translateY(0.13em);
+    margin-left: 0.12em;
+    filter: drop-shadow(0 4px 14px rgb(15 30 46 / 0.14));
+    user-select: none;
+  }
+
   /* Botones */
   .btn {
     @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-wide
@@ -204,21 +216,51 @@
 /* --------------------------------------------------------------------------
    Capas de bruma animada (sólo transform → composición en GPU)
    -------------------------------------------------------------------------- */
+.hero-mist-scroll {
+  inset: -45% 0 -25% 0;
+  opacity: var(--parallax-fade-from, 0.25);
+  transform: translate3d(0, var(--parallax-from, 55%), 0);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(0 0 0 / 0.25) 18%,
+    rgb(0 0 0 / 0.85) 38%,
+    #000 58%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(0 0 0 / 0.25) 18%,
+    rgb(0 0 0 / 0.85) 38%,
+    #000 58%
+  );
+}
+
 .mist-layer {
   position: absolute;
   inset: -20% -30%;
   pointer-events: none;
   will-change: transform;
   background:
-    radial-gradient(40% 28% at 20% 55%, rgb(248 249 250 / 0.75), transparent 70%),
-    radial-gradient(35% 22% at 70% 62%, rgb(226 232 240 / 0.7), transparent 70%),
-    radial-gradient(50% 30% at 50% 78%, rgb(248 249 250 / 0.55), transparent 72%);
+    radial-gradient(45% 32% at 20% 52%, rgb(248 249 250 / 0.85), transparent 72%),
+    radial-gradient(40% 26% at 72% 58%, rgb(226 232 240 / 0.8), transparent 72%),
+    radial-gradient(55% 35% at 50% 76%, rgb(248 249 250 / 0.75), transparent 75%);
 }
 .mist-layer--far {
-  opacity: 0.7;
+  opacity: 0.8;
   background:
-    radial-gradient(45% 25% at 80% 40%, rgb(248 249 250 / 0.6), transparent 70%),
-    radial-gradient(38% 20% at 30% 48%, rgb(226 232 240 / 0.65), transparent 70%);
+    radial-gradient(48% 28% at 80% 38%, rgb(248 249 250 / 0.72), transparent 72%),
+    radial-gradient(42% 24% at 28% 45%, rgb(226 232 240 / 0.75), transparent 72%);
+}
+.mist-layer--dense {
+  background:
+    linear-gradient(
+      to top,
+      rgb(248 249 250 / 0.96) 0%,
+      rgb(226 232 240 / 0.82) 42%,
+      rgb(248 249 250 / 0.45) 72%,
+      transparent 100%
+    );
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -238,13 +280,13 @@
 }
 
 [data-parallax] {
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 @keyframes bruma-parallax {
   from {
     transform: translate3d(0, var(--parallax-from, 0), 0);
-    opacity: 1;
+    opacity: var(--parallax-fade-from, 1);
   }
   to {
     transform: translate3d(0, var(--parallax-to, 0), 0);
@@ -356,12 +398,12 @@
 }
 
 .dish-preview-popover[data-dish-kind='wine'] {
-  width: min(21rem, calc(100vw - 2rem));
+  width: min(24rem, calc(100vw - 2rem));
 }
 
 .dish-preview-popover[data-dish-kind='wine'] .dish-preview-img {
   object-fit: contain;
-  max-height: 58dvh;
+  max-height: 44dvh;
 }
 
 .dish-preview-popover:is(:popover-open, .is-open):where(:not([data-closing])) {

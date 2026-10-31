@@ -1,16 +1,34 @@
+{% load static %}
 {# La Carta · pestañas reactivas por categoría (datos desde la base de datos) #}
 <section id="carta" class="relative overflow-clip bg-espuma py-24 sm:py-32" aria-labelledby="carta-title">
   <div class="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-bruma-100 to-transparent" aria-hidden="true"></div>
 
   <div class="relative mx-auto max-w-6xl px-6">
-    <header class="grid gap-8 lg:grid-cols-12 lg:items-end">
-      <div class="lg:col-span-5">
+    <header>
+      <div>
         <p class="eyebrow" data-reveal>La Carta</p>
         <h2 id="carta-title" class="section-title mt-5" data-reveal>Un viaje <em class="font-normal text-mediterraneo">de sabores</em></h2>
       </div>
-      <p class="text-base leading-relaxed text-tinta/75 lg:col-span-7 lg:text-lg" data-reveal>
-        En Bruma te invitamos a descubrir una carta cuidadosamente diseñada para sorprender y deleitar en cada bocado. Nuestra selección reúne lo mejor de la cocina gourmet, combinando ingredientes selectos con técnicas innovadoras y un toque de creatividad que transforma cada plato en una obra culinaria. Ya sea que busques sabores intensos o combinaciones delicadas, nuestra propuesta está pensada para satisfacer los paladares más exigentes y hacer de tu experiencia gastronómica un verdadero placer. Disfruta de un viaje de sabores en un ambiente donde la pasión por la cocina se refleja en cada detalle.
-      </p>
+
+      <div class="mt-8 grid items-center gap-8 md:grid-cols-12 lg:gap-10">
+        <figure class="relative max-w-sm md:col-span-5 md:max-w-none lg:col-span-4" data-reveal style="--reveal-delay: 80ms">
+          <div class="overflow-hidden rounded-bruma border border-arena/45 bg-white/75 p-1.5 shadow-bruma">
+            <div class="aspect-[16/10] overflow-hidden rounded-2xl bg-bruma">
+              <img src="{% static 'img/entrecot.webp' %}"
+                   alt="Entrecot trinchado a la brasa con escamas de sal negra sobre bandeja de hierro"
+                   width="1024"
+                   height="850"
+                   loading="lazy"
+                   decoding="async"
+                   class="h-full w-full object-cover object-center transition-transform duration-700 ease-marea hover:scale-105">
+            </div>
+          </div>
+        </figure>
+
+        <p class="text-base leading-relaxed text-tinta/75 md:col-span-7 lg:col-span-8 lg:text-lg" data-reveal style="--reveal-delay: 140ms">
+          En Bruma te invitamos a descubrir una carta cuidadosamente diseñada para sorprender y deleitar en cada bocado. Nuestra selección reúne lo mejor de la cocina gourmet, combinando ingredientes selectos con técnicas innovadoras y un toque de creatividad que transforma cada plato en una obra culinaria. Ya sea que busques sabores intensos o combinaciones delicadas, nuestra propuesta está pensada para satisfacer los paladares más exigentes y hacer de tu experiencia gastronómica un verdadero placer. Disfruta de un viaje de sabores en un ambiente donde la pasión por la cocina se refleja en cada detalle.
+        </p>
+      </div>
     </header>
 
     {% if categories %}
@@ -164,7 +182,7 @@
               <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/>
             </svg>
           </button>
-          <div class="dish-preview-media relative flex items-center justify-center overflow-hidden bg-abisal">
+          <div class="dish-preview-media relative flex items-center justify-center overflow-hidden bg-abisal" data-dish-preview-media>
             <img src=""
                  alt=""
                  class="dish-preview-img max-h-[54dvh] w-full object-cover"
@@ -176,7 +194,15 @@
               <span class="shrink-0 font-serif text-lg font-semibold text-arena" data-dish-preview-price></span>
             </div>
             <p class="mt-0.5 text-xs font-semibold tracking-wide text-arena/80 uppercase" data-dish-preview-detail hidden></p>
-            <p class="mt-2 border-t border-white/10 pt-2 text-xs leading-relaxed text-espuma/80 italic" data-dish-preview-notes hidden></p>
+            <p class="mt-1 text-xs font-medium text-arena-light" data-dish-preview-varietal-box hidden>
+              <span class="font-semibold tracking-wide text-espuma/60 uppercase">Varietal:</span>
+              <span data-dish-preview-varietal></span>
+            </p>
+            <p class="mt-2.5 text-xs leading-relaxed text-espuma/85 sm:text-sm" data-dish-preview-description hidden></p>
+            <div class="mt-2.5 rounded-xl border border-arena/30 bg-white/[0.04] px-3.5 py-2.5 text-xs leading-relaxed text-espuma/85" data-dish-preview-notes-box hidden>
+              <span class="font-semibold tracking-wide text-arena uppercase">Notas de cata:</span>
+              <span class="italic" data-dish-preview-notes></span>
+            </div>
           </figcaption>
         </figure>
       </div>
